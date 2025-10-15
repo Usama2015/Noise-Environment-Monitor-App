@@ -1,7 +1,7 @@
 # Noise Environment Monitor App - Project Context
 
-**Last Updated:** 2025-10-14
-**Version:** 1.0.0
+**Last Updated:** 2025-10-15
+**Version:** 1.2.0
 **Status:** Planning Phase
 
 ---
@@ -135,6 +135,139 @@ INFS/
 - **Classification:** TensorFlow Lite / ONNX for on-device inference
 - **Training:** Python (scikit-learn, TensorFlow) for model training
 - **Feature Extraction:** MFCC, spectral features
+
+### **Testing & Quality Assurance**
+- **Unit Testing:** Jest (>80% coverage target)
+- **Component Testing:** React Native Testing Library (>75% coverage)
+- **Integration Testing:** Jest + Supertest (>60% coverage)
+- **E2E Testing:** Detox (critical user flows)
+- **Performance Testing:** React Native Performance, Android Profiler
+- **API Testing:** Supertest, Mock Service Worker (MSW)
+- **CI/CD:** GitHub Actions for automated testing
+
+---
+
+## 🧪 Testing Methodology
+
+**Testing Philosophy:** Test early, test often, automate everything possible
+
+### **Testing Pyramid (70-25-5 Distribution)**
+
+```
+       ╱╲
+      ╱E2E╲         ← 5% - Critical user journeys
+     ╱─────╲
+    ╱  Integ╲       ← 25% - Component interactions, API flows
+   ╱─────────╲
+  ╱Unit Tests╲     ← 70% - Foundation (utils, services, components)
+ ╱────────────╲
+```
+
+### **Testing Levels**
+
+#### **1. Unit Testing (70% of tests)**
+- **What:** Test individual functions, utils, services in isolation
+- **Tools:** Jest
+- **Examples:** DecibelCalculator, FFTProcessor, MovingAverageFilter, Classifier
+- **Coverage Target:** >80%
+- **Run:** `npm test`
+
+#### **2. Component Testing (React Native)**
+- **What:** Test React components with mocked dependencies
+- **Tools:** React Native Testing Library, @testing-library/jest-native
+- **Examples:** DecibelDisplay, ClassificationLabel, HomeScreen, MapScreen
+- **Coverage Target:** >75%
+- **Run:** `npm test -- --testPathPattern=components`
+
+#### **3. Integration Testing (25% of tests)**
+- **Mobile Integration:** Audio capture → Processing → Classification pipeline
+- **FE/BE Integration:** API request → Backend → Response → UI update
+- **Data Flow:** Location service → Storage → Map rendering
+- **Coverage Target:** >60%
+- **Run:** `npm run test:integration`
+
+#### **4. End-to-End Testing (5% of tests)**
+- **What:** Complete user journeys on real devices/emulators
+- **Tools:** Detox
+- **Examples:** Onboarding flow, Monitoring session, Map navigation
+- **Run:** `npm run test:e2e`
+
+#### **5. Performance Testing**
+- **Metrics:** Launch time (<3s), Processing latency (<500ms), Battery (<5%/hr)
+- **Tools:** React Native Performance Monitor, Android Profiler, Xcode Instruments
+
+### **Testing Requirements for Each Development Session**
+
+**Before committing ANY code:**
+- ✅ Write unit tests for new functions/services
+- ✅ Write component tests for new UI components
+- ✅ All existing tests must pass
+- ✅ Code coverage must not decrease
+- ✅ Run `npm run lint` and fix all errors
+
+**After completing each step (1.1, 1.2, etc.):**
+- ✅ Write integration tests for the complete flow
+- ✅ Manual smoke test on device/emulator
+- ✅ Update test documentation
+
+**At end of each phase:**
+- ✅ Run full E2E test suite
+- ✅ Performance profiling
+- ✅ Manual testing on 2+ devices
+- ✅ Update coverage reports in PROGRESS_REPORT.md
+
+### **FE/BE API Flow Testing (Phase 3)**
+
+**Backend API Tests:**
+```typescript
+// Test API endpoints
+POST /api/readings → Should save noise reading
+GET /api/readings → Should return filtered data
+GET /api/heatmap → Should aggregate multi-user data
+```
+
+**Frontend-Backend Integration:**
+```typescript
+// Test complete data flow
+Mobile → Submit reading → API → Database → Confirmation → UI update
+Mobile → Request heatmap → API → Aggregate data → Response → Map render
+Offline → Queue locally → Network returns → Sync to backend → Verify
+```
+
+**Tools:** Supertest (API), Mock Service Worker (mock responses), Jest
+
+### **CI/CD Automation**
+
+**GitHub Actions Workflow:**
+```yaml
+on: [push, pull_request]
+jobs:
+  - Unit tests (run on every commit)
+  - Integration tests (run on PR)
+  - E2E tests (run on merge to develop)
+  - Coverage report (upload to Codecov)
+```
+
+**Quality Gates:**
+- All tests must pass before merge
+- Coverage must be >80% for new code
+- No critical linting errors
+- Performance benchmarks must be met
+
+### **Test File Organization**
+
+```
+mobile-app/
+├── __tests__/              # Unit tests
+│   ├── services/
+│   ├── utils/
+│   └── components/
+├── __integration__/        # Integration tests
+├── e2e/                    # E2E tests
+└── __performance__/        # Performance tests
+```
+
+**For complete testing details, see [TESTING_STRATEGY.md](./docs/testing/TESTING_STRATEGY.md)**
 
 ---
 
@@ -286,6 +419,7 @@ When starting a new session or needing project context:
 |------------|---------|--------------------------------------|------------|
 | 2025-10-14 | 1.0.0   | Initial project context created      | Claude AI  |
 | 2025-10-15 | 1.1.0   | Added Git Workflow Protocol section  | Claude AI  |
+| 2025-10-15 | 1.2.0   | Added Testing Methodology section    | Claude AI  |
 
 ---
 
