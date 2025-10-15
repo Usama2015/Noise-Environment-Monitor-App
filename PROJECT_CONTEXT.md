@@ -37,6 +37,7 @@ INFS/
 ├── PROJECT_CONTEXT.md          ← YOU ARE HERE (Master context file)
 ├── PROJECT_PLAN.md             → Comprehensive development plan
 ├── PROGRESS_REPORT.md          → Real-time progress tracking
+├── DEVELOPMENT_LOG.md          → Detailed step-by-step development journal
 ├── GIT_STRATEGY.md             → Git branching and workflow
 ├── README.md                   → Project overview for repository
 │
@@ -91,6 +92,7 @@ INFS/
 ### **1. Planning & Management**
 - **[PROJECT_PLAN.md](./PROJECT_PLAN.md)** - Complete project roadmap with phases, steps, timelines
 - **[PROGRESS_REPORT.md](./PROGRESS_REPORT.md)** - Live progress tracking (updated daily/weekly)
+- **[DEVELOPMENT_LOG.md](./DEVELOPMENT_LOG.md)** - Detailed development journal (commands, decisions, learnings)
 - **[GIT_STRATEGY.md](./GIT_STRATEGY.md)** - Git workflow, branching strategy, commit conventions
 
 ### **2. Technical Architecture**
@@ -234,8 +236,10 @@ INFS/
 When starting a new session or needing project context:
 1. Read this file (PROJECT_CONTEXT.md) first
 2. Check [PROGRESS_REPORT.md](./PROGRESS_REPORT.md) for latest status
-3. Reference [PROJECT_PLAN.md](./PROJECT_PLAN.md) for next steps
-4. Follow [GIT_STRATEGY.md](./GIT_STRATEGY.md) for version control
+3. Review [DEVELOPMENT_LOG.md](./DEVELOPMENT_LOG.md) to see what was done and how
+4. Reference [PROJECT_PLAN.md](./PROJECT_PLAN.md) for next steps
+5. Follow [GIT_STRATEGY.md](./GIT_STRATEGY.md) for version control
+6. **Update [DEVELOPMENT_LOG.md](./DEVELOPMENT_LOG.md)** after completing work
 
 ### **For Code Reviews:**
 1. Check that changes align with [ARCHITECTURE.md](./docs/architecture/ARCHITECTURE.md)
@@ -321,3 +325,297 @@ cat GIT_STRATEGY.md
 
 **🎓 Academic Project Notice**
 This is a semester project for George Mason University. All development should prioritize learning, documentation, and demonstrable results suitable for academic evaluation.
+
+---
+
+## 🤖 SDETeam AI Agents Integration
+
+**Location:** `D:\OtherDevelopment\SDETeam\agents\`
+
+This project leverages the SDETeam framework - a collection of 40+ specialized AI agents for accelerated development. All agents are available in the SDETeam directory.
+
+### **How to Use SDETeam Agents**
+
+**At the start of EVERY Claude session:**
+1. Read the available agents from `D:\OtherDevelopment\SDETeam\agents\README.md`
+2. Understand which agents are available for each task
+3. Use the appropriate agent via the Task tool for specialized work
+
+**Agent Categories Available:**
+
+| Category | Agents | When to Use |
+|----------|--------|-------------|
+| **Engineering** | rapid-prototyper, frontend-developer, backend-architect, mobile-app-builder, ai-engineer, devops-automator, test-writer-fixer | Mobile app development, API building, testing |
+| **Design** | ui-designer, ux-researcher, brand-guardian, visual-storyteller, whimsy-injector | UI/UX design, component design |
+| **Product** | sprint-prioritizer, trend-researcher, feedback-synthesizer | Feature planning, user research |
+| **Testing** | api-tester, performance-benchmarker, test-results-analyzer | Testing, optimization |
+| **Orchestration** | agent-orchestrator, shared-context, capability-matrix | Complex multi-step tasks |
+| **Project Management** | project-shipper, studio-producer, experiment-tracker | Deployment, coordination |
+
+### **Agent Usage Examples for This Project**
+
+**Phase 1 (Mobile App):**
+- Use `@mobile-app-builder` for React Native setup and scaffolding
+- Use `@frontend-developer` for UI component implementation
+- Use `@ui-designer` for screen layouts and design decisions
+- Use `@test-writer-fixer` for unit test creation
+
+**Phase 2 (GPS & Mapping):**
+- Use `@mobile-app-builder` for GPS integration
+- Use `@frontend-developer` for map component implementation
+- Use `@ui-designer` for heatmap visualization design
+
+**Phase 3 (ML & Backend):**
+- Use `@ai-engineer` for ML model integration
+- Use `@backend-architect` for API design and implementation
+- Use `@devops-automator` for deployment setup
+
+**Complex Tasks:**
+- Use `@agent-orchestrator` for multi-step workflows requiring multiple agents
+- Use Task tool with `general-purpose` agent for research and validation tasks
+
+### **Best Practices for Agent Use**
+
+1. **Always check agent availability** before starting work
+2. **Use specialized agents** for their domain expertise
+3. **Use agent-orchestrator** for coordinating multiple agents
+4. **Document agent usage** in DEVELOPMENT_LOG.md
+5. **Parallel execution** when tasks are independent (multiple Task calls in one message)
+
+**Command to see all agents:**
+```bash
+ls D:\OtherDevelopment\SDETeam\agents\
+cat D:\OtherDevelopment\SDETeam\agents\README.md
+```
+
+---
+
+## 📝 Automatic Documentation Update Protocol
+
+**IMPORTANT:** After completing ANY development iteration, the following files MUST be updated automatically by Claude:
+
+### **Files to Update After Each Development Session**
+
+#### **1. DEVELOPMENT_LOG.md** (MANDATORY - Always Update)
+
+**When:** After EVERY coding session or task completion
+
+**What to add:**
+- New session entry with date/time
+- Activity description with commands executed
+- Files created/modified with purposes
+- Decisions made with reasoning
+- Issues encountered and solutions
+- Code snippets for key implementations
+- Performance metrics or test results
+- Next steps
+
+**Template:**
+```markdown
+## YYYY-MM-DD
+
+### Session X: [Brief Title]
+
+**Time:** [Morning/Afternoon/Evening]
+**Phase:** [Phase number - description]
+**Team Member:** [Who worked on this]
+
+#### Activity X: [What was done]
+
+**What was done:**
+- Bullet points
+
+**Commands executed:**
+```bash
+npm install package-name
+```
+
+**Files created/modified:**
+- path/to/file.ts - Purpose and key features
+
+**Decisions made:**
+- Why choice X over Y
+
+**Issues encountered:**
+- Error/problem
+- How it was solved
+
+### Session Summary
+- Time spent
+- Accomplishments
+- Key learnings
+- Next steps
+```
+
+---
+
+#### **2. PROGRESS_REPORT.md** (Update Weekly or After Major Milestones)
+
+**When:**
+- End of each week
+- After completing a phase
+- After major milestone achievement
+
+**What to update:**
+- Current phase status in summary table
+- Weekly progress log entry
+- Current sprint backlog
+- Metrics (features complete, test coverage, etc.)
+- Blockers (if any)
+- Test results summary
+
+**Sections to update:**
+1. Phase Status Summary table
+2. Weekly Progress Log (add new week)
+3. Current Sprint Details
+4. Metrics & KPIs tables
+5. Blockers & Issues (if applicable)
+
+---
+
+#### **3. README.md** (Update After Major Feature Additions)
+
+**When:**
+- New major feature implemented
+- Tech stack changes
+- Installation steps change
+- New dependencies added
+
+**What to update:**
+- Features list (if new features added)
+- Installation instructions (if dependencies changed)
+- Quick start commands (if setup changed)
+- Project status badges
+
+---
+
+#### **4. Git Commit & Branch** (MANDATORY After Each Session)
+
+**When:** After completing any coding work
+
+**What to do:**
+1. Stage changes: `git add .`
+2. Commit with conventional commit message:
+   ```bash
+   git commit -m "feat(audio): implement FFT processor"
+   # or
+   git commit -m "fix(gps): resolve null location crash"
+   # or
+   git commit -m "docs: update development log for session X"
+   ```
+3. Push to current branch: `git push origin <branch-name>`
+
+**Commit Message Format:**
+```
+type(scope): description
+
+[optional body]
+
+[optional footer]
+```
+
+Types: feat, fix, docs, style, refactor, test, chore
+
+---
+
+#### **5. Additional Files (Update As Needed)**
+
+**docs/architecture/ARCHITECTURE.md:**
+- When: System architecture changes
+- What: Update diagrams, data flow, component descriptions
+
+**docs/testing/TESTING_STRATEGY.md:**
+- When: New testing approaches added
+- What: Update test plans, add new test cases
+
+**PROJECT_PLAN.md:**
+- When: Timeline changes, phase adjustments
+- What: Update milestones, deliverables, timelines
+
+---
+
+### **Automated Update Checklist (Copy This for Each Session)**
+
+After completing development work, Claude should:
+
+- [ ] **DEVELOPMENT_LOG.md** - Add session entry with all details
+- [ ] **PROGRESS_REPORT.md** - Update if weekly or milestone reached
+- [ ] **Git Commit** - Commit changes with conventional message
+- [ ] **README.md** - Update if major features/deps changed
+- [ ] **TODO List** - Update via TodoWrite tool
+- [ ] **Architecture docs** - Update if system design changed
+- [ ] **Testing docs** - Update if tests added
+
+---
+
+### **Quick Update Commands**
+
+```bash
+# After coding session:
+git add .
+git commit -m "type(scope): what was done"
+git push origin <branch-name>
+
+# Verify updates:
+git log -1
+git status
+```
+
+---
+
+### **Documentation Quality Standards**
+
+When updating documentation:
+1. **Be specific** - Include exact commands, file paths, versions
+2. **Explain why** - Not just what, but reasoning behind decisions
+3. **Include outputs** - Show command results, error messages
+4. **Link commits** - Reference git commit hashes where relevant
+5. **Be chronological** - Maintain time-based order in logs
+6. **Be complete** - Don't skip "obvious" steps
+
+---
+
+### **Example: Complete Update Flow**
+
+**After implementing audio capture feature:**
+
+1. **Update DEVELOPMENT_LOG.md:**
+```markdown
+## 2025-10-15
+### Session 3: Audio Capture Implementation
+**Commands:** npm install react-native-audio
+**Files:** src/services/AudioService.ts
+**Decisions:** Chose react-native-audio over expo-av for better control
+```
+
+2. **Update TODO list:**
+```typescript
+TodoWrite: Mark "Implement microphone audio capture" as completed
+```
+
+3. **Commit to Git:**
+```bash
+git add .
+git commit -m "feat(audio): implement microphone capture with react-native-audio
+
+- Add AudioService.ts for audio recording
+- Request microphone permissions
+- Extract audio samples as Float32Array
+- Handle permission denial gracefully
+
+Closes #5"
+git push origin feature/audio-capture
+```
+
+4. **Update PROGRESS_REPORT.md** (if end of week):
+```markdown
+### Week 3
+**Completed:**
+- ✅ Audio capture implementation
+**In Progress:**
+- 🔄 Decibel calculation
+```
+
+---
+
+**This ensures all documentation stays synchronized with development progress and provides complete traceability.**
