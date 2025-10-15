@@ -307,7 +307,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Contact
 
 For questions or support, please contact:
-- **Project Lead:** Usama Sarfaraz Khan ([ukhan26@gmu.edu](mailto:ukhan26@gmu.edu))
+- **Project Lead:** To Be Decided
 - **GitHub Issues:** [Report an issue](https://github.com/your-team/noise-environment-monitor/issues)
 
 ---
