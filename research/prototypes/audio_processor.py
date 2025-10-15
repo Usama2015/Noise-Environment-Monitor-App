@@ -49,7 +49,7 @@ class AudioProcessor:
             # Load audio file with librosa (handles multiple formats)
             audio, sr = librosa.load(file_path, sr=self.sample_rate, mono=True)
 
-            print(f"✓ Loaded audio: {file_path}")
+            print(f"[OK] Loaded audio: {file_path}")
             print(f"  Duration: {len(audio) / sr:.2f} seconds")
             print(f"  Sample rate: {sr} Hz")
             print(f"  Samples: {len(audio)}")
@@ -339,7 +339,7 @@ def test_audio_processor():
     sf.write('test_noisy.wav', noisy_audio, sample_rate)
     results_noisy = processor.process_audio_file('test_noisy.wav')
 
-    print("\n✓ Audio processor test completed!")
+    print("\n[OK] Audio processor test completed!")
     print(f"\nTest Results:")
     print(f"  Quiet audio classified as: {results_quiet['classification']}")
     print(f"  Noisy audio classified as: {results_noisy['classification']}")

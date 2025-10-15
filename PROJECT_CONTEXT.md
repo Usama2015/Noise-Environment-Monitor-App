@@ -285,6 +285,7 @@ When starting a new session or needing project context:
 | Date       | Version | Changes                              | Updated By |
 |------------|---------|--------------------------------------|------------|
 | 2025-10-14 | 1.0.0   | Initial project context created      | Claude AI  |
+| 2025-10-15 | 1.1.0   | Added Git Workflow Protocol section  | Claude AI  |
 
 ---
 
@@ -619,3 +620,192 @@ git push origin feature/audio-capture
 ---
 
 **This ensures all documentation stays synchronized with development progress and provides complete traceability.**
+
+---
+
+## 🌿 Git Workflow Protocol
+
+**MANDATORY:** All development work MUST follow the Git Flow workflow defined in [GIT_STRATEGY.md](./GIT_STRATEGY.md).
+
+### **Critical Git Rules**
+
+**NEVER commit directly to `main` or `develop` branches** (except for minor documentation fixes on develop).
+
+**ALWAYS use feature branches** for ALL development work, including:
+- Phase work (e.g., `phase/0-research`, `phase/1-core-app`)
+- Features (e.g., `feature/audio-capture`, `feature/gps-integration`)
+- Bug fixes (e.g., `bugfix/decibel-calculation-error`)
+- Experiments (e.g., `experiment/new-fft-algorithm`)
+
+### **Proper Workflow for Each Phase**
+
+#### **Phase 0 Example:**
+```bash
+# Start Phase 0
+git checkout develop
+git pull origin develop
+git checkout -b phase/0-research
+
+# Do all Phase 0 work in this branch
+# - Create prototypes
+# - Generate samples
+# - Train classifier
+# Commit frequently with conventional commits
+
+# When Phase 0 is complete
+git checkout develop
+git merge phase/0-research
+git push origin develop
+git branch -d phase/0-research  # Delete local branch
+```
+
+#### **Phase 1 Example (with feature branches):**
+```bash
+# Start Phase 1
+git checkout develop
+git checkout -b phase/1-core-app
+
+# For each step in Phase 1, create feature branch
+git checkout -b feature/audio-capture  # From phase/1-core-app
+
+# Work on feature
+git add .
+git commit -m "feat(audio): implement microphone capture"
+git push origin feature/audio-capture
+
+# Merge feature back to phase branch
+git checkout phase/1-core-app
+git merge feature/audio-capture
+git branch -d feature/audio-capture
+
+# Repeat for other features...
+
+# When Phase 1 complete
+git checkout develop
+git merge phase/1-core-app
+git push origin develop
+```
+
+### **Commit Message Requirements**
+
+**ALWAYS use Conventional Commits format:**
+
+```
+<type>(<scope>): <subject>
+
+[optional body]
+
+[optional footer]
+```
+
+**Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `perf`, `ci`, `build`, `revert`
+
+**Examples:**
+```bash
+git commit -m "feat(audio): implement FFT processor"
+git commit -m "fix(gps): handle null location gracefully"
+git commit -m "docs: update development log for session 3"
+git commit -m "test(classifier): add unit tests for classification"
+git commit -m "chore(deps): update react-native to 0.72.5"
+```
+
+### **Before Starting ANY New Work**
+
+**Checklist:**
+1. **Check current branch:** `git branch` (should NOT be on main/develop)
+2. **Read GIT_STRATEGY.md:** Review branching strategy
+3. **Create appropriate branch:**
+   - For new phase: `git checkout -b phase/X-name`
+   - For feature: `git checkout -b feature/name`
+   - For bugfix: `git checkout -b bugfix/name`
+4. **Verify you're on correct branch:** `git status`
+
+### **After Completing Work**
+
+**Checklist:**
+1. **Stage changes:** `git add .` or `git add <specific-files>`
+2. **Commit with conventional message:** `git commit -m "type(scope): description"`
+3. **Push to remote:** `git push origin <branch-name>`
+4. **Update DEVELOPMENT_LOG.md** with session details
+5. **Merge to parent branch** when feature/phase is complete
+
+### **Quick Reference Commands**
+
+```bash
+# Check current branch
+git branch
+
+# See all branches
+git branch -a
+
+# Check working directory status
+git status
+
+# Create and switch to new branch
+git checkout -b <branch-name>
+
+# Switch to existing branch
+git checkout <branch-name>
+
+# Commit with message
+git commit -m "type(scope): description"
+
+# Push to remote
+git push origin <branch-name>
+
+# Merge branch
+git checkout target-branch
+git merge source-branch
+
+# Delete branch (after merge)
+git branch -d <branch-name>
+```
+
+### **Common Mistakes to Avoid**
+
+❌ **DON'T:**
+- Commit directly to `main` or `develop`
+- Use vague commit messages ("fix bug", "update code")
+- Skip branch creation for new features
+- Force push to shared branches
+- Commit without testing
+
+✅ **DO:**
+- Create feature/phase branches for all work
+- Write descriptive conventional commit messages
+- Test before committing
+- Push regularly to backup work
+- Merge completed work back to develop
+
+### **Git Safety Net**
+
+If you realize you're on the wrong branch:
+```bash
+# DON'T PANIC!
+# Check what branch you're on
+git branch
+
+# If you haven't committed yet, stash changes
+git stash
+
+# Switch to correct branch
+git checkout correct-branch
+
+# Apply stashed changes
+git stash pop
+```
+
+### **Enforcement**
+
+Claude AI Assistant MUST:
+1. **Check current Git branch** before starting work
+2. **Create appropriate branch** if not already on one
+3. **Use conventional commits** for ALL commits
+4. **Document Git operations** in DEVELOPMENT_LOG.md
+5. **Follow Git Flow workflow** as defined in GIT_STRATEGY.md
+
+**Failure to follow Git workflow will result in messy history and difficulty tracking changes.**
+
+---
+
+**For complete Git workflow details, see [GIT_STRATEGY.md](./GIT_STRATEGY.md).**
