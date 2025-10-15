@@ -29,7 +29,7 @@ export class MovingAverageFilter {
    * @param value - New decibel value
    * @returns Filtered (smoothed) value
    */
-  add(value: number): number {
+  add(_value: number): number {
     // TODO: Implement moving average
     // 1. Add value to buffer
     // 2. Remove oldest value if buffer exceeds window size
@@ -59,8 +59,8 @@ export class MovingAverageFilter {
  * @returns Smoothed array
  */
 export function applyMovingAverage(
-  data: number[],
-  windowSize: number
+  _data: number[],
+  _windowSize: number
 ): number[] {
   // TODO: Implement array-based moving average
   throw new Error('Not implemented');

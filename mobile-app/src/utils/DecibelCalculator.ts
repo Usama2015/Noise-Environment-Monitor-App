@@ -23,8 +23,8 @@
  * @returns Decibel level (dB SPL)
  */
 export function calculateDecibels(
-  samples: Float32Array,
-  referenceValue: number = 0.00002
+  _samples: Float32Array,
+  _referenceValue: number = 0.00002
 ): number {
   // TODO: Implement decibel calculation
   // 1. Calculate RMS
@@ -38,7 +38,7 @@ export function calculateDecibels(
  * @param samples - Audio samples
  * @returns RMS value
  */
-export function calculateRMS(samples: Float32Array): number {
+export function calculateRMS(_samples: Float32Array): number {
   // TODO: Implement RMS calculation
   throw new Error('Not implemented');
 }
