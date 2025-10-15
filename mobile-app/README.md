@@ -18,11 +18,15 @@ Mobile application for measuring, classifying, and visualizing ambient noise lev
 - Historical noise data tracking
 
 ### Current Status
-**Phase 1, Step 1.1: React Native Setup** - COMPLETE
-- React Native project initialized with TypeScript
-- Testing framework configured (Jest + React Native Testing Library)
-- Folder structure created
-- Type definitions established
+**Phase 1, Step 1.2: Microphone Audio Capture** - COMPLETE
+- ✅ React Native project initialized with TypeScript
+- ✅ Testing framework configured (Jest + React Native Testing Library)
+- ✅ Folder structure created
+- ✅ Type definitions established
+- ✅ AudioService implemented (340 lines)
+- ✅ 26 unit tests with 96.96% coverage
+- ✅ Android/iOS microphone permissions configured
+- ✅ Manual testing tool available
 
 ---
 
@@ -93,40 +97,136 @@ npm run ios
 
 ## Testing
 
-### Run All Tests
+### Quick Verification
+
+**Verify setup is correct:**
+```bash
+node verify-setup.js
+```
+
+This script checks:
+- Node.js version
+- Dependencies installed
+- Configuration files present
+- TypeScript compiles
+- Android/iOS permissions configured
+
+**Expected output:** All checks ✅ passing
+
+---
+
+### Automated Tests
+
+#### Run All Unit Tests
 ```bash
 npm test
 ```
 
-### Run Tests in Watch Mode
+**Current status:**
+- 27 tests total (1 App + 26 AudioService)
+- All passing ✅
+- Coverage: 96.96%
+
+#### Run Tests in Watch Mode (Development)
 ```bash
 npm run test:watch
 ```
 
-### Generate Coverage Report
+#### Generate Coverage Report
 ```bash
 npm run test:coverage
 ```
 
-### Run Integration Tests
+**Coverage thresholds:**
+- Statements: 80%
+- Branches: 80%
+- Functions: 80%
+- Lines: 80%
+
+#### Run Specific Test File
+```bash
+npm test -- AudioService.test.ts
+npm test -- DecibelCalculator.test.ts  # After Step 1.3
+```
+
+#### Run Integration Tests
 ```bash
 npm run test:integration
 ```
 
-### Run E2E Tests
+#### Run E2E Tests (Detox)
 ```bash
 npm run test:e2e
 ```
 
-### Run Performance Tests
+#### Run Performance Tests
 ```bash
 npm run test:performance
 ```
 
+---
+
+### Manual Testing
+
+#### Test AudioService on Device/Emulator
+
+**1. Use the test app component:**
+
+Replace `App.tsx` temporarily:
+```bash
+# Backup current App.tsx
+mv App.tsx App.tsx.backup
+
+# Copy test app
+cp src/__manual__/AudioServiceTestApp.tsx App.tsx
+
+# Run app
+npm run android  # or npm run ios
+
+# Restore after testing
+mv App.tsx.backup App.tsx
+```
+
+**2. Test features:**
+- Tap "Request Permission" → Should show permission dialog
+- Tap "Start Recording" → Should start capturing audio
+- Observe "Last Sample" section → Should update every ~1 second
+- Check logs → Should show "Received sample #X"
+- Tap "Stop Recording" → Should stop cleanly
+- Tap "Get Config" → Should show audio configuration
+
+**3. Expected behavior:**
+- Permission granted
+- 3-5 samples per 5 seconds
+- Float32Array with ~44100 values
+- Values in range [-1.0, 1.0]
+- No crashes or errors
+
+---
+
+### Testing Documentation
+
+For comprehensive testing instructions, see:
+
+**Main Guide:**
+- `docs/testing/USER_TESTING_GUIDE.md` - Complete testing guide for all implementations
+
+**Quick Links:**
+- Phase 0 Python testing: Section "Testing Phase 0: Python Prototype"
+- Phase 1 Mobile testing: Section "Testing Phase 1: Mobile App"
+- Manual testing tools: Section "AudioService Manual Testing"
+- Troubleshooting: Section "Troubleshooting"
+
+---
+
 ### Coverage Goals
-- **Unit Tests:** > 80%
-- **Integration Tests:** > 60%
-- **E2E Tests:** 100% of critical flows
+
+| Test Type | Target | Current |
+|-----------|--------|---------|
+| **Unit Tests** | >80% | 96.96% ✅ |
+| **Integration Tests** | >60% | TBD |
+| **E2E Tests** | 100% critical flows | TBD |
+| **Component Tests** | >75% | TBD |
 
 ---
 
@@ -203,8 +303,8 @@ docs: update installation instructions
 
 ### Phase 1: Core Mobile App (Current)
 - **Step 1.1:** React Native Setup ✅ COMPLETE
-- **Step 1.2:** Microphone Permission & Audio Capture (Next)
-- **Step 1.3:** Decibel Calculation
+- **Step 1.2:** Microphone Permission & Audio Capture ✅ COMPLETE
+- **Step 1.3:** Decibel Calculation (Next)
 - **Step 1.4:** Moving Average Filter
 - **Step 1.5:** FFT Implementation
 - **Step 1.6:** Threshold-Based Classification
@@ -317,4 +417,4 @@ For issues or questions:
 ---
 
 **Last Updated:** 2025-10-15
-**Status:** Phase 1, Step 1.1 Complete
+**Status:** Phase 1, Step 1.2 Complete (AudioService + Testing Documentation)
