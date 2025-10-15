@@ -3,8 +3,8 @@
 **Purpose:** Step-by-step guide for testing all implemented features of the Noise Environment Monitor application.
 
 **Last Updated:** October 15, 2025
-**Version:** 1.0
-**Covers:** Phase 0 (Python Prototype) + Phase 1 Steps 1.1-1.2 (Mobile App)
+**Version:** 2.0
+**Covers:** Phase 0 (Python Prototype) + Phase 1 Complete (Steps 1.1-1.7)
 
 ---
 
@@ -29,8 +29,11 @@ This guide covers testing for:
 | **Phase 0** | ✅ Complete | Python audio processing prototype + ML classifier |
 | **Phase 1.1** | ✅ Complete | React Native mobile app setup |
 | **Phase 1.2** | ✅ Complete | Microphone audio capture service |
-| **Phase 1.3** | 🔄 In Progress | Decibel calculation |
-| **Phase 1.4-1.7** | ⏳ Pending | Remaining mobile features |
+| **Phase 1.3** | ✅ Complete | Decibel calculation |
+| **Phase 1.4** | ✅ Complete | Moving average filter |
+| **Phase 1.5** | ✅ Complete | FFT processor |
+| **Phase 1.6** | ✅ Complete | Noise classifier |
+| **Phase 1.7** | ✅ Complete | Basic UI implementation |
 
 ### Testing Philosophy
 
@@ -881,6 +884,626 @@ npx react-native run-ios --simulator="iPhone 14"
 
 ---
 
+### Test 5: Complete Phase 1 App Manual Testing
+
+**What it tests:** Full noise monitoring app with real-time audio processing, classification, and UI
+
+**Prerequisites:**
+- Phase 1.1-1.7 complete
+- App installed on physical device or emulator
+- Microphone permission granted
+- Access to different noise environments
+
+---
+
+#### Test 5.1: App Launch and Permissions
+
+**Objective:** Verify app launches and requests microphone permissions
+
+**Steps:**
+
+1. Launch the Noise Monitor app
+2. Observe the home screen
+
+**Expected Results:**
+- App displays green header with "Noise Monitor" title
+- Subtitle reads "Environmental Sound Analysis"
+- Start Monitoring button is visible (green background)
+- No error messages displayed
+- Info section shows usage instructions
+
+**Screenshot Description:**
+```
+┌─────────────────────────────┐
+│  Noise Monitor              │  ← Green header
+│  Environmental Sound...     │  ← Subtitle
+├─────────────────────────────┤
+│                             │
+│    [Decibel Display]        │  ← Shows 0.0 dB initially
+│         0.0 dB              │
+│                             │
+│    [Classification Badge]   │  ← Not visible until monitoring
+│                             │
+│  ┌───────────────────────┐ │
+│  │  Start Monitoring     │ │  ← Green button
+│  └───────────────────────┘ │
+│                             │
+│  How to use:                │
+│  1. Tap "Start Monitoring"  │
+│  2. Grant microphone...     │
+│  3. See real-time...        │
+│  4. View history...         │
+└─────────────────────────────┘
+```
+
+3. Tap "Start Monitoring" button
+4. If prompted, grant microphone permission
+
+**Expected Results:**
+- Permission dialog appears (first time only)
+- "Allow" and "Deny" options shown
+- After granting permission:
+  - Button changes to red "Stop Monitoring"
+  - Status indicator appears: "🟢 Monitoring active"
+  - Decibel display starts updating in real-time
+  - Classification badge appears
+
+**✅ Pass Criteria:**
+- App launches without crashes
+- Permission requested (first time)
+- Monitoring starts after permission granted
+- UI updates to monitoring state
+
+**❌ Fail Indicators:**
+- App crashes on launch
+- Permission dialog doesn't appear
+- Error message: "Microphone permission denied"
+- Button doesn't change state
+- No decibel updates
+
+---
+
+#### Test 5.2: Quiet Environment Detection
+
+**Objective:** Verify app correctly detects quiet environments
+
+**Steps:**
+
+1. Ensure monitoring is active
+2. Move to a quiet environment:
+   - Library
+   - Silent room
+   - Study area
+   - Office (no one talking)
+3. Wait for 5-10 seconds for readings to stabilize
+4. Observe the UI
+
+**Expected Results:**
+
+**Decibel Display:**
+- Shows value < 50 dB (typically 20-45 dB)
+- Background color: Light green (#E8F5E9)
+- Text color: Dark green (#2E7D32)
+- Value updates every 1-2 seconds
+
+**Classification Badge:**
+- Icon: 🟢 (green circle)
+- Category: "Quiet"
+- Background color: Green (#4CAF50)
+- Description: May show "Tonal Sound" if there's specific noise
+- Confidence bar: Visible (typically 80-100%)
+
+**Noise History:**
+- Shows "Recent Readings" section
+- Lists recent decibel values with green dots
+- Timestamps show "Xs ago" or "Xm ago"
+- All entries show "Quiet" category
+
+**Example Reading:**
+```
+Recent Readings
+┌─────────────────────────────────┐
+│ 🟢  42.3 dB  Quiet    5s ago   │
+│ 🟢  41.8 dB  Quiet    6s ago   │
+│ 🟢  43.1 dB  Quiet    7s ago   │
+└─────────────────────────────────┘
+```
+
+**✅ Pass Criteria:**
+- Decibel reading < 50 dB
+- Category shows "Quiet"
+- Green color scheme throughout
+- Confidence > 70%
+- Readings relatively stable (low variance)
+
+**❌ Fail Indicators:**
+- Decibel reading > 50 dB in silent room
+- Category shows "Normal" or "Noisy" incorrectly
+- Values jump erratically (> 10 dB swings)
+- No updates (frozen display)
+
+---
+
+#### Test 5.3: Normal Environment Detection
+
+**Objective:** Verify app correctly detects normal conversational noise
+
+**Steps:**
+
+1. Ensure monitoring is active
+2. Move to a normal environment:
+   - Office with people talking
+   - Cafeteria during lunch
+   - Living room with TV on
+   - Classroom during discussion
+3. Wait for 5-10 seconds for readings to stabilize
+4. Observe the UI
+
+**Expected Results:**
+
+**Decibel Display:**
+- Shows value 50-70 dB (typically 55-65 dB)
+- Background color: Light yellow/orange (#FFF3E0)
+- Text color: Dark orange (#E65100)
+- Value updates smoothly
+
+**Classification Badge:**
+- Icon: 🟡 (yellow circle)
+- Category: "Normal"
+- Background color: Yellow/Orange (#FFC107)
+- Description: May show:
+  - "Voice / Music" (if tonal)
+  - "General Ambient Noise" (if broadband)
+- Confidence bar: 70-95%
+
+**Noise History:**
+- Mix of yellow dots (🟡)
+- Values in 50-70 dB range
+- Category: "Normal"
+
+**Example Reading:**
+```
+Recent Readings
+┌─────────────────────────────────┐
+│ 🟡  62.4 dB  Normal    3s ago   │
+│ 🟡  58.9 dB  Normal    4s ago   │
+│ 🟡  61.2 dB  Normal    5s ago   │
+│ 🟡  59.7 dB  Normal    6s ago   │
+└─────────────────────────────────┘
+```
+
+**✅ Pass Criteria:**
+- Decibel reading 50-70 dB
+- Category shows "Normal"
+- Yellow/orange color scheme
+- Confidence > 70%
+- Descriptions reflect noise type
+
+**❌ Fail Indicators:**
+- Normal conversation classified as "Quiet" or "Noisy"
+- Decibel values outside 50-70 dB range consistently
+- Confidence < 50%
+
+---
+
+#### Test 5.4: Noisy Environment Detection
+
+**Objective:** Verify app correctly detects noisy environments
+
+**Steps:**
+
+1. Ensure monitoring is active
+2. Move to a noisy environment:
+   - Street with heavy traffic
+   - Construction site
+   - Busy restaurant/bar
+   - Loud music playing
+3. Wait for 5-10 seconds for readings to stabilize
+4. Observe the UI
+
+**Expected Results:**
+
+**Decibel Display:**
+- Shows value > 70 dB (typically 75-90 dB)
+- Background color: Light red (#FFEBEE)
+- Text color: Dark red (#C62828)
+- Value updates frequently
+
+**Classification Badge:**
+- Icon: 🔴 (red circle)
+- Category: "Noisy"
+- Background color: Red (#F44336)
+- Description: May show:
+  - "Traffic / Heavy Machinery" (if low-frequency dominant)
+  - "White Noise / Static" (if broadband)
+  - "Loud Music" (if tonal)
+- Confidence bar: 80-100%
+
+**Noise History:**
+- Red dots (🔴)
+- Values > 70 dB
+- Category: "Noisy"
+
+**Example Reading:**
+```
+Recent Readings
+┌─────────────────────────────────┐
+│ 🔴  78.2 dB  Noisy    2s ago   │
+│ 🔴  81.5 dB  Noisy    3s ago   │
+│ 🔴  79.8 dB  Noisy    4s ago   │
+│ 🔴  77.4 dB  Noisy    5s ago   │
+└─────────────────────────────────┘
+```
+
+**✅ Pass Criteria:**
+- Decibel reading > 70 dB
+- Category shows "Noisy"
+- Red color scheme throughout
+- Confidence > 70%
+- Descriptions match noise type (traffic, music, etc.)
+
+**❌ Fail Indicators:**
+- Loud noise classified as "Normal" or "Quiet"
+- Values capped at certain threshold
+- App crashes in loud environments
+
+---
+
+#### Test 5.5: Moving Average Smoothing Verification
+
+**Objective:** Verify moving average filter smooths sudden spikes
+
+**Steps:**
+
+1. Start monitoring in a quiet environment
+2. Wait for 5-10 seconds (quiet readings should be stable)
+3. Create a sudden loud noise (clap hands, shout, door slam)
+4. Observe the decibel display and readings
+5. Wait for 5-10 seconds after the noise
+
+**Expected Results:**
+
+**During Spike:**
+- Decibel value increases but NOT to maximum instantly
+- Spike is smoothed over 2-5 readings
+- Classification may briefly change to "Normal" or "Noisy"
+- UI animates the transition
+
+**After Spike:**
+- Values gradually return to quiet levels
+- Takes 3-5 seconds to stabilize back to quiet
+- Not an instant drop
+
+**Example Sequence:**
+```
+Before spike:
+  42.3 dB (Quiet)
+  41.8 dB (Quiet)
+
+[CLAP HANDS]
+
+During/After spike:
+  52.4 dB (Normal)    ← Smoothed, not full spike
+  48.9 dB (Quiet)     ← Gradually decreasing
+  45.2 dB (Quiet)
+  43.7 dB (Quiet)
+  42.1 dB (Quiet)     ← Back to baseline
+```
+
+**✅ Pass Criteria:**
+- Spike is smoothed (not instant jump to maximum)
+- Recovery is gradual (3-5 seconds)
+- No erratic jumping between categories
+- Moving average window = 5 samples (1-2 second smoothing)
+
+**❌ Fail Indicators:**
+- Instant jump to maximum value
+- Instant drop back to quiet
+- No smoothing visible
+- Values freeze during spike
+
+---
+
+#### Test 5.6: Noise Type Description Accuracy
+
+**Objective:** Verify enhanced classification detects specific noise types
+
+**Steps:**
+
+1. **Test Tonal Sound (Voice/Music):**
+   - Play pure tone or music with melody
+   - Speak or hum into microphone
+   - Expected: Description shows "Voice / Music" or "Tonal Sound"
+
+2. **Test White Noise:**
+   - Play white noise from speaker
+   - Turn on fan or air conditioner
+   - Expected: Description shows "White Noise / Static"
+
+3. **Test Low-Frequency Rumble:**
+   - Play bass-heavy music
+   - Record near traffic or heavy machinery
+   - Expected: Description shows "Traffic / Heavy Machinery" or "Low-Frequency Rumble"
+
+**Expected Results:**
+
+**For Each Noise Type:**
+- Description appears below category badge
+- Description text color: Gray (#666)
+- Font size: 13px
+- Matches the actual noise source
+
+**Spectral Features Being Used:**
+- **Spectral Flatness:** < 0.5 = Tonal, > 0.5 = Noise-like
+- **Low Frequency Ratio:** > 0.3 = Low-frequency dominant
+- **Dominant Frequency:** Shown in description if tonal
+
+**✅ Pass Criteria:**
+- Pure tone detected as "Tonal Sound"
+- White noise detected with high spectral flatness
+- Traffic/rumble detected with high low-freq ratio
+- Descriptions update with classification changes
+
+**❌ Fail Indicators:**
+- All noise shows same description
+- Descriptions don't match actual sound
+- Description field empty or undefined
+
+---
+
+#### Test 5.7: Confidence Indicator Validation
+
+**Objective:** Verify confidence calculation reflects classification certainty
+
+**Steps:**
+
+1. Monitor in stable quiet environment
+   - Expected: High confidence (90-100%)
+
+2. Monitor in ambiguous environment (near threshold)
+   - Play audio at ~50 dB (Quiet/Normal boundary)
+   - Play audio at ~70 dB (Normal/Noisy boundary)
+   - Expected: Lower confidence (60-80%)
+
+3. Monitor in mixed environment
+   - Quiet room with occasional talking
+   - Expected: Varying confidence as sound changes
+
+**Expected Results:**
+
+**Confidence Bar:**
+- Horizontal bar below category badge
+- Width: Proportional to confidence (0-100%)
+- Colors:
+  - 80-100%: Green (#4CAF50)
+  - 60-79%: Yellow (#FFC107)
+  - 50-59%: Orange (#FF9800)
+  - < 50%: Red (#F44336) - should be rare
+- Percentage displayed on right side
+
+**Confidence Levels:**
+- **Stable Environment:** 90-100%
+- **Near Threshold:** 60-80%
+- **Transitioning:** 50-70%
+
+**✅ Pass Criteria:**
+- Confidence bar renders correctly
+- Percentage matches bar width
+- High confidence in stable environments
+- Lower confidence near thresholds
+- Minimum confidence >= 50% (design requirement)
+
+**❌ Fail Indicators:**
+- Confidence always 100%
+- Confidence < 50% in stable environment
+- Bar width doesn't match percentage
+- Confidence bar missing
+
+---
+
+#### Test 5.8: History Display and Timestamps
+
+**Objective:** Verify noise history displays correctly with accurate timestamps
+
+**Steps:**
+
+1. Start monitoring
+2. Wait for 30 seconds to accumulate 5-10 readings
+3. Scroll through history (if more than 10 readings)
+4. Observe timestamps and formatting
+
+**Expected Results:**
+
+**History List:**
+- Title: "Recent Readings"
+- Maximum 10 readings displayed (newest first)
+- Each reading shows:
+  - Category dot (🟢🟡🔴)
+  - Decibel value (XX.X dB)
+  - Category name (Quiet/Normal/Noisy)
+  - Timestamp (Xs ago, Xm ago, Xh ago)
+  - Description (if available)
+
+**Timestamp Formatting:**
+- < 60s: "Xs ago" (e.g., "5s ago")
+- < 60m: "Xm ago" (e.g., "3m ago")
+- >= 60m: "Xh ago" (e.g., "2h ago")
+
+**Scrolling:**
+- Scrollable if > screen height
+- Smooth scrolling
+- No performance issues
+
+**✅ Pass Criteria:**
+- Newest reading at top
+- Timestamps accurate (±2 seconds)
+- Maximum 10 readings shown
+- Older readings removed automatically
+- Formatting consistent
+
+**❌ Fail Indicators:**
+- Oldest reading at top
+- Timestamps incorrect or negative
+- More than 10 readings displayed
+- Duplicate timestamps
+- Scrolling laggy
+
+---
+
+#### Test 5.9: Stop/Restart Monitoring
+
+**Objective:** Verify stopping and restarting monitoring works correctly
+
+**Steps:**
+
+1. Start monitoring (green button → red button)
+2. Let it run for 10-20 seconds
+3. Tap "Stop Monitoring" button
+4. Observe the UI
+5. Wait 5 seconds
+6. Tap "Start Monitoring" again
+7. Observe the UI
+
+**Expected Results:**
+
+**After Stopping:**
+- Button changes to green "Start Monitoring"
+- Status indicator disappears (no "Monitoring active")
+- Decibel display freezes at last value
+- Classification badge remains visible
+- History preserved (not cleared)
+- No new readings added
+
+**After Restarting:**
+- Button changes to red "Stop Monitoring"
+- Status indicator reappears
+- Decibel display updates again
+- History CLEARED (fresh start)
+- New readings start from 0
+
+**✅ Pass Criteria:**
+- Stop button works immediately
+- No more audio samples processed after stop
+- Restart works without re-requesting permissions
+- History cleared on restart (design choice)
+- No memory leaks (can stop/start multiple times)
+
+**❌ Fail Indicators:**
+- Button doesn't respond
+- Audio keeps processing after stop
+- Permission requested again on restart
+- App crashes on stop/restart
+
+---
+
+#### Test 5.10: Performance and Responsiveness
+
+**Objective:** Verify app performs well under continuous use
+
+**Steps:**
+
+1. Start monitoring
+2. Run for 5 minutes continuously
+3. Monitor device performance:
+   - Battery usage
+   - CPU usage
+   - Memory usage
+   - UI responsiveness
+4. Interact with UI during monitoring:
+   - Scroll history
+   - Tap buttons
+   - Switch apps and return
+
+**Expected Results:**
+
+**Processing Performance:**
+- Audio processing < 100ms per second (requirement)
+- UI updates smoothly (60 fps)
+- No lag or stuttering
+- Decibel display animates smoothly
+
+**Resource Usage:**
+- CPU: Moderate (20-40% usage)
+- Memory: Stable (no memory leaks)
+- Battery: Reasonable for audio processing app
+
+**UI Responsiveness:**
+- Button taps respond immediately
+- Scrolling smooth
+- No frozen UI
+- App resumes correctly after backgrounding
+
+**✅ Pass Criteria:**
+- Processing time < 100ms per second
+- UI remains responsive
+- No crashes after 5+ minutes
+- Memory usage stable
+- Can run continuously without issues
+
+**❌ Fail Indicators:**
+- Processing time > 100ms (fails performance requirement)
+- UI freezes or lags
+- Memory increases continuously
+- App crashes after extended use
+- Battery drains rapidly
+
+---
+
+#### Test 5.11: Error Handling
+
+**Objective:** Verify app handles errors gracefully
+
+**Test Scenarios:**
+
+**1. Permission Denied:**
+- Steps: Deny microphone permission when prompted
+- Expected: Error message appears: "Microphone permission denied. Please enable it in settings."
+- Expected: Button remains green (monitoring doesn't start)
+
+**2. Restart After Permission Denial:**
+- Steps: Grant permission in device settings, return to app, tap "Start Monitoring"
+- Expected: Monitoring starts successfully without app restart
+
+**3. Background App:**
+- Steps: Start monitoring, switch to another app, return
+- Expected: Monitoring continues (on Android) or shows appropriate state
+
+**4. Airplane Mode:**
+- Steps: Enable airplane mode (microphone should still work)
+- Expected: App continues monitoring (doesn't require network)
+
+**✅ Pass Criteria:**
+- Error messages displayed clearly
+- App doesn't crash on errors
+- Recovery possible without restart
+- Errors logged to console for debugging
+
+**❌ Fail Indicators:**
+- App crashes on permission denial
+- No error message shown
+- Cannot recover without app restart
+- Silent failures
+
+---
+
+### Test 5 Summary Checklist
+
+Use this checklist when testing the complete Phase 1 app:
+
+- [ ] **Launch & Permissions:** App launches, permission requested
+- [ ] **Quiet Detection:** < 50 dB, green theme, "Quiet" category
+- [ ] **Normal Detection:** 50-70 dB, yellow theme, "Normal" category
+- [ ] **Noisy Detection:** > 70 dB, red theme, "Noisy" category
+- [ ] **Smoothing:** Spikes smoothed over 3-5 readings
+- [ ] **Noise Types:** Tonal/white noise/rumble detected correctly
+- [ ] **Confidence:** Appropriate confidence levels (usually > 70%)
+- [ ] **History:** Recent readings displayed with timestamps
+- [ ] **Stop/Restart:** Works correctly, history cleared on restart
+- [ ] **Performance:** < 100ms processing, smooth UI
+- [ ] **Error Handling:** Graceful error messages, no crashes
+
+---
+
 ## End-to-End Testing
 
 ### E2E Test: Python Prototype → Mobile App Data Flow
@@ -1138,12 +1761,42 @@ Use this checklist to verify all implementations:
 - [ ] Microphone permission requested
 - [ ] Audio samples captured successfully
 
-### Phase 1.3+: Future Tests
-- [ ] Decibel calculation accuracy verified
-- [ ] Moving average filter smooths data
+### Phase 1.3: Decibel Calculation
+- [ ] DecibelCalculator unit tests pass (14/14)
+- [ ] RMS calculation accuracy verified
+- [ ] Decibel conversion correct (20 * log10(RMS))
+- [ ] Test coverage > 95%
+
+### Phase 1.4: Moving Average Filter
+- [ ] MovingAverageFilter unit tests pass (17/17)
+- [ ] Filter smooths spike data correctly
+- [ ] Window size configurable (default: 5)
+- [ ] Reset functionality works
+
+### Phase 1.5: FFT Processor
+- [ ] FFTProcessor unit tests pass (24/24)
 - [ ] FFT produces correct frequencies
-- [ ] Classification matches Python model
-- [ ] UI displays real-time data
+- [ ] Spectral features extracted (9 features)
+- [ ] Peak detection works
+
+### Phase 1.6: Noise Classifier
+- [ ] NoiseClassifier unit tests pass (26/26)
+- [ ] Simple classification works (Quiet/Normal/Noisy)
+- [ ] Enhanced classification with features
+- [ ] Confidence calculation accurate
+
+### Phase 1.7: UI Components
+- [ ] DecibelDisplay component tests pass (16/16)
+- [ ] ClassificationBadge tests pass (20/20)
+- [ ] NoiseHistory tests pass (22/22)
+- [ ] HomeScreen integrates all components
+- [ ] App builds and runs on device
+
+### Phase 1 Integration Tests
+- [ ] Complete pipeline integration tests pass (15+ tests)
+- [ ] Processing time < 100ms per second
+- [ ] Quiet/Normal/Noisy environments detected correctly
+- [ ] Noise type detection works (white noise, tonal, rumble)
 
 ---
 
