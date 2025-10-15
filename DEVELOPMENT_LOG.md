@@ -1332,6 +1332,511 @@ https://github.com/Usama2015/Noise-Environment-Monitor-App/pull/new/phase/1-core
 
 ---
 
+---
+
+### Session 5: Phase 1 Step 1.2 - Microphone Audio Capture
+
+**Time:** Evening
+**Phase:** Phase 1 - Core Mobile App Development (Step 1.2)
+**Team Member:** Audio capture implementation with comprehensive testing
+
+---
+
+#### Activity 1: Audio Library Research and Selection
+
+**What was done:**
+- Researched React Native audio recording libraries
+- Evaluated compatibility with React Native 0.82 and TypeScript
+- Selected react-native-audio-record for implementation
+
+**Libraries Evaluated:**
+1. **react-native-audio-record** (CHOSEN)
+   - Focused on recording (not playback)
+   - Direct access to PCM audio data via base64
+   - Cross-platform (iOS/Android)
+   - Lightweight with minimal dependencies
+   - Real-time streaming with callbacks
+   - Active maintenance
+
+2. **expo-av**
+   - Heavier, focused on playback
+   - Requires Expo infrastructure
+   - Not chosen for this project
+
+3. **react-native-audio**
+   - Older library
+   - Less active maintenance
+   - Not chosen
+
+4. **@react-native-community/audio-toolkit**
+   - More complex API
+   - Larger footprint
+   - Not chosen
+
+**Decision:** react-native-audio-record v0.2.2
+
+**Rationale:**
+- Best fit for raw audio access
+- Minimal overhead
+- Real-time callbacks essential for live monitoring
+- Well-documented TypeScript support
+
+---
+
+#### Activity 2: Library Installation and Configuration
+
+**What was done:**
+- Installed react-native-audio-record package
+- Installed @types/node for Buffer support
+- Updated Android permissions
+- Updated iOS permissions
+
+**Commands executed:**
+```bash
+cd D:/OtherDevelopment/INFS/mobile-app
+
+# Install audio recording library
+npm install react-native-audio-record
+
+# Install Node.js types for Buffer
+npm install --save-dev @types/node
+```
+
+**Files modified:**
+
+1. **mobile-app/package.json**
+   - Added: `"react-native-audio-record": "^0.2.2"`
+   - Added: `"@types/node": "^24.7.2"` (devDependencies)
+
+2. **mobile-app/android/app/src/main/AndroidManifest.xml**
+   - Added: `<uses-permission android:name="android.permission.RECORD_AUDIO" />`
+
+3. **mobile-app/ios/NoiseMonitor/Info.plist**
+   - Added microphone usage description:
+   ```xml
+   <key>NSMicrophoneUsageDescription</key>
+   <string>Noise Monitor needs access to your microphone to measure ambient noise levels and classify your environment.</string>
+   ```
+
+**Dependencies installed:** 2 packages
+- react-native-audio-record: Core audio recording library
+- @types/node: TypeScript definitions for Node.js Buffer
+
+---
+
+#### Activity 3: AudioService Implementation
+
+**What was done:**
+- Implemented complete AudioService class (340 lines)
+- Singleton pattern for app-wide audio management
+- Platform-specific permission handling (Android/iOS)
+- Real-time audio streaming with callbacks
+- Base64 to Float32Array conversion with PCM normalization
+- Comprehensive error handling
+
+**File created:**
+**mobile-app/src/services/AudioService.ts** (340 lines)
+
+**Key Implementation Details:**
+
+**Audio Configuration:**
+```typescript
+sampleRate: 44100,        // Matches Python prototype
+channels: 1,              // Mono audio
+bitsPerSample: 16,        // 16-bit PCM
+audioSource: 6,           // VOICE_RECOGNITION (Android)
+wavFile: 'audio.wav'      // Temporary file name
+```
+
+**Core Methods Implemented:**
+
+1. **requestPermission(): Promise<boolean>**
+   - Platform-specific permission requests
+   - Android: Uses PermissionsAndroid.request()
+   - iOS: Handled automatically by system
+   - Returns: true if granted, false if denied
+   - Throws: AudioServiceError on failure
+
+2. **startRecording(): Promise<void>**
+   - Initializes audio recording library
+   - Checks for permission before starting
+   - Prevents duplicate recording attempts
+   - Sets up audio data callback
+   - Throws: AudioServiceError on failure
+
+3. **stopRecording(): Promise<void>**
+   - Stops active recording
+   - Validates recording is active
+   - Cleanup audio resources
+   - Throws: AudioServiceError if not recording
+
+4. **onAudioSample(callback): () => void**
+   - Registers callback for audio samples
+   - Supports multiple callbacks
+   - Returns unsubscribe function
+   - Isolates callback errors (won't crash service)
+
+5. **getRecordingStatus(): boolean**
+   - Returns current recording state
+   - No side effects
+
+6. **getConfig(): AudioConfig**
+   - Returns immutable audio configuration
+   - Prevents external modification
+
+7. **clearCallbacks(): void**
+   - Removes all registered callbacks
+   - Useful for cleanup
+
+8. **cleanup(): Promise<void>**
+   - Stops recording if active
+   - Clears all callbacks
+   - Complete service reset
+
+**Audio Sample Processing:**
+```typescript
+// Base64 PCM data → Float32Array conversion
+private base64ToFloat32Array(base64: string): Float32Array {
+  const buffer = Buffer.from(base64, 'base64');
+  const int16Array = new Int16Array(buffer.buffer);
+  const float32Array = new Float32Array(int16Array.length);
+
+  // Normalize 16-bit PCM to [-1.0, 1.0] range
+  for (let i = 0; i < int16Array.length; i++) {
+    float32Array[i] = int16Array[i] / 32768.0;
+  }
+
+  return float32Array;
+}
+```
+
+**Error Handling:**
+- Custom `AudioServiceError` class
+- Preserves original error context
+- Specific error messages for each failure type
+- Callback error isolation (logs but doesn't crash)
+
+**Platform Differences:**
+| Aspect | Android | iOS |
+|--------|---------|-----|
+| Permission Request | Programmatic (`PermissionsAndroid`) | System-handled |
+| Permission Dialog | Customizable title/message | Standard system dialog |
+| Audio Source | Configurable (VOICE_RECOGNITION) | Automatic |
+
+---
+
+#### Activity 4: Unit Testing Implementation
+
+**What was done:**
+- Created comprehensive test suite (488 lines)
+- Achieved 96.96% code coverage
+- All 26 tests passing
+- Mocked react-native-audio-record library
+- Tested all public methods and error scenarios
+
+**File created:**
+**mobile-app/__tests__/AudioService.test.ts** (488 lines)
+
+**Test Categories:**
+
+1. **Permission Management (4 tests)**
+   - Android permission request success
+   - Android permission denial
+   - iOS permission handling (no prompt)
+   - Permission request failure handling
+
+2. **Recording Lifecycle (5 tests)**
+   - Start recording initialization
+   - Prevent duplicate initialization
+   - Error when already recording
+   - Permission denied error handling
+   - Recording failure handling
+
+3. **Stopping Recording (3 tests)**
+   - Successful stop
+   - Error when not recording
+   - Stop recording failure handling
+
+4. **Audio Sample Callbacks (3 tests)**
+   - Register and invoke callback
+   - Multiple callbacks support
+   - Unsubscribe function
+
+5. **Audio Sample Processing (1 test)**
+   - Base64 to Float32Array conversion accuracy
+
+6. **State Management (4 tests)**
+   - Initial recording status (false)
+   - Status during recording (true)
+   - Status after stopping (false)
+   - Config retrieval and immutability
+
+7. **Utility Methods (2 tests)**
+   - Clear callbacks
+   - Cleanup method
+
+8. **Error Handling (4 tests)**
+   - Callback errors don't crash service
+   - AudioServiceError properties
+   - Stop recording when not started
+   - Cleanup when not recording
+
+**Test Coverage Results:**
+```
+File                | % Stmts | % Branch | % Funcs | % Lines
+--------------------|---------|----------|---------|----------
+AudioService.ts     |   96.96 |    88.88 |     100 |   96.92
+```
+
+**Exceeds all targets:** ✅
+- Statement coverage: 96.96% (target: >80%)
+- Branch coverage: 88.88% (target: >80%)
+- Function coverage: 100% (target: >80%)
+- Line coverage: 96.92% (target: >80%)
+
+---
+
+#### Activity 5: Configuration Updates
+
+**What was done:**
+- Updated TypeScript configuration for Node.js types
+- Updated ESLint configuration for coverage directory
+- Fixed linting issues in placeholder files
+
+**Files modified:**
+
+1. **mobile-app/tsconfig.json**
+   - Added `"@types/node"` to types array
+   - Added `"@types/jest"` to types array
+   - Enables Buffer and other Node.js globals in TypeScript
+
+2. **mobile-app/.eslintrc.js**
+   - Added `"coverage/"` to ignorePatterns
+   - Prevents ESLint from checking generated coverage reports
+
+3. **mobile-app/src/utils/DecibelCalculator.ts**
+   - Prefixed unused placeholder parameters with underscore
+   - Follows ESLint convention for intentionally unused parameters
+   - Example: `_samples: Float32Array` → indicates parameter not yet used
+
+4. **mobile-app/src/utils/MovingAverageFilter.ts**
+   - Same linting fix for placeholder parameters
+   - Maintains TypeScript signatures for future implementation
+
+---
+
+#### Activity 6: Documentation
+
+**What was done:**
+- Created comprehensive implementation report
+- Documented all features, API, and design decisions
+
+**File created:**
+**mobile-app/IMPLEMENTATION_REPORT_STEP_1.2.md** (detailed report)
+
+**Key sections:**
+- Executive summary
+- Library selection rationale
+- Implementation details
+- Test coverage results
+- API reference
+- Usage examples for Step 1.3
+- Performance characteristics
+- Platform differences
+- Next steps
+
+---
+
+#### Activity 7: Verification and Validation
+
+**What was done:**
+- Ran complete test suite
+- Verified coverage thresholds
+- Checked TypeScript compilation
+- Validated ESLint rules
+
+**Verification commands:**
+```bash
+cd D:/OtherDevelopment/INFS/mobile-app
+
+# Run AudioService tests
+npm test -- AudioService.test.ts
+# Result: ✅ 26/26 tests passed
+
+# Check coverage
+npm run test:coverage -- AudioService.test.ts
+# Result: ✅ 96.96% coverage (exceeds 80% target)
+
+# TypeScript compilation
+npx tsc --noEmit
+# Result: ✅ No compilation errors
+
+# ESLint
+npm run lint
+# Result: ✅ No linting errors
+```
+
+**Verification Results:**
+- All tests passing: ✅ 26/26
+- Coverage: ✅ 96.96% (exceeds 80%)
+- TypeScript: ✅ No errors
+- ESLint: ✅ No errors
+- Production-ready: ✅
+
+---
+
+#### Activity 8: Git Commit and Push
+
+**What was done:**
+- Staged all Step 1.2 implementation files
+- Committed with detailed conventional commit message
+- Pushed to phase/1-core-app branch
+
+**Commands executed:**
+```bash
+cd D:/OtherDevelopment/INFS
+git add mobile-app/
+git commit -m "feat(audio): complete Phase 1 Step 1.2 - microphone audio capture
+
+Implement production-ready AudioService with comprehensive testing:
+
+Core Implementation:
+- Install react-native-audio-record v0.2.2 for raw audio access
+- Implement AudioService singleton with 340 lines of TypeScript
+- Platform-specific permission handling (Android/iOS)
+- Real-time audio streaming with callback mechanism
+- Base64 to Float32Array conversion with PCM normalization
+- Custom AudioServiceError class for error handling
+- Memory-efficient callback management with unsubscribe
+
+Audio Configuration:
+- Sample rate: 44100 Hz (matches Python prototype)
+- Channels: 1 (mono)
+- Bit depth: 16-bit PCM
+- Output: Float32Array normalized to [-1.0, 1.0]
+- Audio source: VOICE_RECOGNITION (Android)
+
+Testing:
+- 488 lines of comprehensive unit tests
+- 26 test cases covering all functionality
+- 96.96% statement coverage (exceeds 80% target)
+- 88.88% branch coverage
+- 100% function coverage
+- All tests passing
+
+Permissions:
+- Android: RECORD_AUDIO permission added to AndroidManifest.xml
+- iOS: NSMicrophoneUsageDescription added to Info.plist
+
+[... full commit message ...]
+
+Phase 1, Step 1.2: COMPLETE ✅
+Ready for Step 1.3: Decibel Calculation"
+
+git push origin phase/1-core-app
+```
+
+**Commit details:**
+- Commit hash: 41ab610
+- Branch: phase/1-core-app
+- Files changed: 11 files
+- Insertions: 1,280 lines
+- New files: AudioService.ts, AudioService.test.ts, IMPLEMENTATION_REPORT_STEP_1.2.md
+- Remote: Successfully pushed to GitHub
+
+---
+
+### Session Summary
+
+**Time Spent:** ~3 hours (including agent execution and testing)
+
+**What was accomplished:**
+- Researched and selected react-native-audio-record library
+- Implemented production-quality AudioService (340 lines)
+- Wrote comprehensive unit tests (488 lines, 26 tests)
+- Achieved 96.96% test coverage (exceeds 80% target)
+- Added Android/iOS microphone permissions
+- Fixed linting issues in placeholder files
+- Created detailed implementation documentation
+- Committed and pushed to remote repository
+- **COMPLETED PHASE 1, STEP 1.2**
+
+**Files Created:**
+- src/services/AudioService.ts (340 lines)
+- __tests__/AudioService.test.ts (488 lines)
+- IMPLEMENTATION_REPORT_STEP_1.2.md (comprehensive report)
+
+**Files Modified:**
+- package.json (added 2 dependencies)
+- android/app/src/main/AndroidManifest.xml (RECORD_AUDIO permission)
+- ios/NoiseMonitor/Info.plist (microphone usage description)
+- tsconfig.json (added node/jest types)
+- .eslintrc.js (added coverage ignore pattern)
+- src/utils/DecibelCalculator.ts (fixed linting)
+- src/utils/MovingAverageFilter.ts (fixed linting)
+
+**Dependencies Added:**
+- react-native-audio-record@0.2.2
+- @types/node@24.7.2
+
+**Key Metrics:**
+- Lines of implementation code: 340
+- Lines of test code: 488
+- Test/Code ratio: 1.44:1 (excellent)
+- Tests passing: 26/26
+- Coverage: 96.96%
+- TypeScript errors: 0
+- ESLint errors: 0
+
+**Key Learnings:**
+1. react-native-audio-record provides excellent raw audio access
+2. Base64 PCM encoding requires Buffer for efficient decoding
+3. Singleton pattern ideal for device-wide audio resource management
+4. Platform-specific permission handling requires conditional logic
+5. Callback error isolation prevents single bad callback from crashing service
+6. Test coverage >95% achievable with comprehensive mocking
+
+**Challenges Encountered:**
+1. **Buffer availability** - Resolved by installing @types/node
+2. **Audio callback signature** - Adjusted types to match actual API (string, not object)
+3. **TypeScript types** - Used library's built-in types
+4. **ESLint unused parameters** - Prefixed with underscore per convention
+
+**Phase 1 Status:**
+- Step 1.1: ✅ COMPLETE (React Native Setup)
+- Step 1.2: ✅ COMPLETE (Audio Capture)
+- Step 1.3: ⏳ NEXT (Decibel Calculation)
+- Step 1.4: ⏳ PENDING (Moving Average Filter)
+- Step 1.5: ⏳ PENDING (FFT Implementation)
+- Step 1.6: ⏳ PENDING (Threshold Classification)
+- Step 1.7: ⏳ PENDING (Basic UI)
+
+**Next Steps:**
+1. Begin Step 1.3: Decibel Calculation
+2. Implement calculateRMS() function
+3. Implement calculateDecibels() function
+4. Calibrate reference value with test audio
+5. Write unit tests for decibel calculation
+6. Integrate with AudioService for real-time dB display
+
+**Ready to proceed:** Phase 1, Step 1.3 - Decibel Calculation
+
+**AudioService API Ready for Step 1.3:**
+```typescript
+// Register callback to receive audio samples
+AudioService.onAudioSample((sample: AudioSample) => {
+  // sample.samples: Float32Array at 44100 Hz
+  // sample.sampleRate: 44100
+  // sample.timestamp: Date
+
+  // Step 1.3: Calculate decibels from samples
+  const dB = calculateDecibels(sample.samples);
+  console.log(`${dB.toFixed(1)} dB`);
+});
+```
+
+---
+
 **Last Updated:** 2025-10-15
-**Total Sessions Logged:** 4
-**Total Time Tracked:** ~7-8 hours
+**Total Sessions Logged:** 5
+**Total Time Tracked:** ~10-11 hours
