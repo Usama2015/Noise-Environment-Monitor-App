@@ -2,7 +2,8 @@
 
 **Project:** Noise Environment Monitor App
 **Team:** Group 4 (GMU)
-**Last Updated:** 2025-10-14
+**Last Updated:** 2025-11-20
+**Current Branch:** `phase/1-core-app`
 
 ---
 
