@@ -174,6 +174,43 @@ Task Type?
 
 ---
 
+### **PRE-IMPLEMENTATION VERIFICATION (Before Coding Any Step)**
+
+**Purpose:** Ensure all architectural decisions, library compatibility, and implementation details are confirmed before writing code.
+
+**Reference Document:** [FINAL_PLAN_REVIEW.md](FINAL_PLAN_REVIEW.md)
+
+```
+[ ] Read FINAL_PLAN_REVIEW.md
+[ ] Confirm all library versions are verified and compatible
+[ ] Confirm heatmap support is validated (react-native-maps 1.26.18)
+[ ] Confirm data flow and architecture are sound
+[ ] Confirm scope is appropriate for semester project
+[ ] Confirm all critical unknowns are resolved
+[ ] Confirm exact code is available in IMPLEMENTATION_SPEC.md
+```
+
+**Verification Checklist:**
+```
+[✅] React Native 20.0.0 compatibility confirmed
+[✅] @react-native-picker/picker 2.11.4 verified
+[✅] react-native-maps 1.26.18 verified with Heatmap support
+[✅] @react-native-community/geolocation 3.4.0 verified
+[✅] Firebase Firestore data model validated
+[✅] 1-second upload frequency acceptable
+[✅] Battery impact estimated (~3%/hour)
+[✅] All code specified in IMPLEMENTATION_SPEC.md
+```
+
+**⚠️ DO NOT START CODING until all items above are ✅**
+
+**Code Reference Document:** [IMPLEMENTATION_SPEC.md](IMPLEMENTATION_SPEC.md)
+- Contains exact, copy-paste ready code for all steps
+- Includes line counts and time estimates
+- Use this during implementation to avoid mistakes
+
+---
+
 ### **PHASE 1B: Firebase Services**
 
 #### **Step 1B-1: Install Firebase Dependencies** ✅ COMPLETED
@@ -293,11 +330,13 @@ Claude's Actions After User Completes:
 Branch: phase/2-firebase-integration
 Status: NOT STARTED
 Dependencies: Step 1B-6 complete
+Code Reference: IMPLEMENTATION_SPEC.md - Step 1B-7 (30 lines, 2 hours)
 
 Pre-Step Actions:
 [ ] Ensure on correct branch: git checkout phase/2-firebase-integration
 [ ] Pull latest: git pull origin phase/2-firebase-integration
 [ ] Create step branch: git checkout -b step/1b-7-audio-refactor
+[ ] Read IMPLEMENTATION_SPEC.md Step 1B-7 for exact code
 
 Implementation Checklist:
 [ ] Read src/services/AudioService.ts
@@ -350,10 +389,12 @@ Next Step: Step 1B-8 (Location Picker UI)
 Branch: phase/2-firebase-integration
 Status: NOT STARTED
 Dependencies: Step 1B-7 complete
+Code Reference: IMPLEMENTATION_SPEC.md - Step 1B-8 (80 lines, 3 hours)
 
 Pre-Step Actions:
 [ ] Ensure on correct branch: git checkout phase/2-firebase-integration
 [ ] Create step branch: git checkout -b step/1b-8-location-picker
+[ ] Read IMPLEMENTATION_SPEC.md Step 1B-8 for exact code
 
 Implementation Checklist:
 [ ] Read src/screens/HomeScreen.tsx
@@ -457,10 +498,12 @@ Next Step: Step 2-2 (Heatmap Overlay)
 Branch: phase/2-firebase-integration
 Status: NOT STARTED
 Dependencies: Step 2-1 complete
+Code Reference: IMPLEMENTATION_SPEC.md - Step 2-2 (120 lines, 4 hours)
 
 Pre-Step Actions:
 [ ] Ensure on correct branch: git checkout phase/2-firebase-integration
 [ ] Create step branch: git checkout -b step/2-2-heatmap
+[ ] Read IMPLEMENTATION_SPEC.md Step 2-2 for exact code
 
 Implementation Checklist:
 [ ] Update MapScreen.tsx
@@ -509,10 +552,12 @@ Next Step: Step 2-4 (Tab Navigation)
 Branch: phase/2-firebase-integration
 Status: NOT STARTED
 Dependencies: Steps 2-1, 2-2, 2-3 complete
+Code Reference: IMPLEMENTATION_SPEC.md - Step 2-4 (30 lines, 2 hours)
 
 Pre-Step Actions:
 [ ] Ensure on correct branch: git checkout phase/2-firebase-integration
 [ ] Create step branch: git checkout -b step/2-4-navigation
+[ ] Read IMPLEMENTATION_SPEC.md Step 2-4 for exact code
 
 Implementation Checklist:
 [ ] Install: npm install @react-navigation/native @react-navigation/bottom-tabs
@@ -594,9 +639,19 @@ Next Phase: Phase 3 (Testing & Polish)
     - Update data model if changed
     - Update roadmap
 
-[ ] PROJECT_PLAN_FIREBASE.md
+[ ] FIREBASE_IMPLEMENTATION_GUIDE.md
     - Update implementation steps
     - Update code examples
+
+[ ] IMPLEMENTATION_SPEC.md
+    - Update exact code if implementation changes
+    - Update line counts and time estimates
+    - Ensure all code is copy-paste ready
+
+[ ] FINAL_PLAN_REVIEW.md
+    - Update if architectural decisions change
+    - Update if library versions change
+    - Re-verify if scope changes
 
 [ ] GIT_STRATEGY.md
     - Update branch structure if changed

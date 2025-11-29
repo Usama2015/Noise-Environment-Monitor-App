@@ -291,13 +291,15 @@ All users' maps update in real-time
 |----------|--------|---------|
 | **DEVELOPMENT_WORKFLOW.md** | ⭐ Master | Step-by-step execution checklist |
 | **PROJECT_BLUEPRINT.md** | ✅ Current | Architecture & system design |
+| **FINAL_PLAN_REVIEW.md** | ✅ Current | Pre-implementation validation & verification |
+| **IMPLEMENTATION_SPEC.md** | ✅ Current | Exact code for all implementation steps |
 | **FIREBASE_IMPLEMENTATION_GUIDE.md** | ✅ Current | Code examples & Firebase tutorials |
 | **PROGRESS_REPORT.md** | ✅ Current | Progress tracking & metrics |
 | **GIT_STRATEGY.md** | ✅ Current | Git workflow & conventions |
 | **TESTING_STRATEGY.md** | ✅ Current | Testing guide with examples |
+| **FILE_REDUNDANCY_ANALYSIS.md** | ✅ Current | Documentation analysis |
 | **SESSION_SUMMARY_2025-11-20.md** | ✅ Archived | Session history |
 | **SESSION_SUMMARY_2025-11-29.md** | ✅ Archived | Session history |
-| **FILE_REDUNDANCY_ANALYSIS.md** | ✅ Current | Documentation analysis |
 | **archive/REVISED_ARCHITECTURE.md** | ❌ Archived | Deprecated - use PROJECT_BLUEPRINT.md |
 
 ---
@@ -311,6 +313,8 @@ All users' maps update in real-time
 **🔗 Key Documents:**
 - [DEVELOPMENT_WORKFLOW.md](DEVELOPMENT_WORKFLOW.md) - ⭐ Start here every session
 - [PROJECT_BLUEPRINT.md](PROJECT_BLUEPRINT.md) - Architecture reference
+- [FINAL_PLAN_REVIEW.md](FINAL_PLAN_REVIEW.md) - Pre-implementation validation
+- [IMPLEMENTATION_SPEC.md](IMPLEMENTATION_SPEC.md) - Exact code for all steps
 - [FIREBASE_IMPLEMENTATION_GUIDE.md](FIREBASE_IMPLEMENTATION_GUIDE.md) - Code examples
 - [GIT_STRATEGY.md](GIT_STRATEGY.md) - Git workflow
 - [TESTING_STRATEGY.md](TESTING_STRATEGY.md) - Testing guide
