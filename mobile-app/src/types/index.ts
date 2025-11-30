@@ -1,7 +1,9 @@
 /**
  * Type definitions for Noise Environment Monitor App
- * Phase 1: Core Types for Audio Processing and Classification
+ * Cloud-First Edition with Firebase
  */
+
+import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 
 /**
  * Classification categories for noise levels
@@ -12,54 +14,63 @@
 export type NoiseClassification = 'Quiet' | 'Normal' | 'Noisy';
 
 /**
- * Raw audio sample data from microphone
+ * Firestore document structure for noise readings
+ * This is the primary data model stored in the cloud
  */
-export interface AudioSample {
-  samples: Float32Array;
-  sampleRate: number;
-  timestamp: Date;
+export interface NoiseReadingDocument {
+  // WHO (Managed by Auth)
+  userId: string;          // Firebase UID (Anonymous)
+  deviceId?: string;       // Optional: Device model for debugging
+
+  // WHEN (Managed by Server)
+  timestamp: FirebaseFirestoreTypes.Timestamp;
+
+  // WHAT (The Data)
+  decibel: number;         // e.g., 65.4
+  classification: NoiseClassification; // "Quiet" | "Normal" | "Noisy"
+
+  // WHERE (The Hybrid Location)
+  location: {
+    latitude: number;      // GPS Lat (for Map placement)
+    longitude: number;     // GPS Long (for Map placement)
+    building: string;      // User Selected: "Fenwick Library"
+    room: string;          // User Selected: "3rd Floor Quiet Area"
+  };
+
+  sessionId: string;       // UUID to group continuous readings
 }
 
 /**
- * Decibel reading with classification
- */
-export interface DecibelReading {
-  value: number;
-  timestamp: Date;
-  classification: NoiseClassification;
-}
-
-/**
- * Complete noise reading with optional location data
- * This is the primary data model for storing measurements
+ * Local representation of a noise reading (before upload)
+ * Used in the app before converting to NoiseReadingDocument
  */
 export interface NoiseReading {
-  id: string;
-  timestamp: Date;
-  decibels: number;
+  decibel: number;
   classification: NoiseClassification;
-  latitude?: number;
-  longitude?: number;
-  locationName?: string;
+  location: {
+    latitude: number;
+    longitude: number;
+    building: string;
+    room: string;
+  };
+  sessionId: string;
 }
 
 /**
- * FFT analysis result containing frequency domain data
+ * Location picker item structure
  */
-export interface FrequencyData {
-  frequencies: number[];
-  magnitudes: number[];
-  sampleRate: number;
+export interface CampusLocation {
+  id: string;
+  name: string;
+  rooms: string[];
 }
 
 /**
- * Extracted audio features for classification
+ * App permission status
  */
-export interface AudioFeatures {
-  spectralCentroid: number;
-  spectralEnergy: number;
-  dominantFrequency: number;
-  energyDistribution: number[];
+export interface PermissionStatus {
+  microphone: boolean;
+  location: boolean;
 }
 
 /**
@@ -70,12 +81,4 @@ export interface LocationCoordinates {
   longitude: number;
   accuracy: number;
   timestamp: Date;
-}
-
-/**
- * App permission status
- */
-export interface PermissionStatus {
-  microphone: boolean;
-  location: boolean;
 }
