@@ -3,36 +3,36 @@
  *
  * Features:
  * - Request microphone permission (Android & iOS)
- * - Start/stop audio recording with expo-av
- * - Real-time dB metering using expo-av's built-in metering
+ * - Start/stop audio monitoring with dB metering
  * - Industry-standard time weighting (IEC 61672)
  * - 125ms "Fast" response for real-time display
  * - 1-second "Slow" response for classification (industry standard)
  * - Handle permission denial gracefully
- * - Android 14 compatible with foreground service support
+ * - Android 14 compatible
  *
  * Technical Specifications (IEC 61672 Compliant):
  * - Metering interval: 125ms ("Fast" response - approximates human ear)
  * - Classification window: 1000ms (1 second - "Slow" response, industry standard)
- * - Sample rate: 44100 Hz
- * - Channels: 1 (mono)
- * - Format: M4A/AAC (iOS/Android compatible)
+ * - Averaging: Logarithmic dB averaging (mathematically correct)
  *
  * Time Weighting Standards:
  * - Fast (F): 125ms - Real-time display updates
  * - Slow (S): 1000ms - Classification and storage (ISO 1996, IEC 61672)
  *
  * Architecture:
- * OLD: Microphone → PCM samples → FFT → Classification
- * NEW: Microphone → expo-av metering → dB value → Classification
+ * Microphone → sound-level monitoring → dB value → Buffer (1-sec) → Classify
+ *          ↓
+ *    Real-time UI updates (125ms)
+ *          ↓
+ *    Classification (1 second average)
  *
  * @see PROJECT_PLAN.md - Step 1.2: Microphone Permission & Audio Capture
  * @see IEC 61672 - Sound level meters specifications
  * @see ISO 1996 - Environmental noise measurement standards
  */
 
-import { Audio } from 'expo-av';
 import { Platform, PermissionsAndroid } from 'react-native';
+import RNSoundLevel from 'react-native-sound-level';
 import { AudioSample } from '../types';
 
 /**
@@ -90,9 +90,9 @@ export class AudioService {
     realTime: [],
     classification: [],
   };
-  private recording: Audio.Recording | null = null;
   private meteringInterval: NodeJS.Timeout | null = null;
   private dbReadings: number[] = []; // Buffer for 1-second window
+  private lastDbValue: number = 0;
   private config: AudioConfig = {
     sampleRate: 44100, // 44.1kHz standard
     channels: 1, // Mono audio
@@ -123,14 +123,11 @@ export class AudioService {
             buttonPositive: 'OK',
           },
         );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          return false;
-        }
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
       }
 
-      // Request expo-av permissions
-      const { status } = await Audio.requestPermissionsAsync();
-      return status === 'granted';
+      // iOS: Permission handled automatically on first use
+      return true;
     } catch (error) {
       throw new AudioServiceError(
         AudioErrorType.PERMISSION_DENIED,
@@ -141,69 +138,39 @@ export class AudioService {
   }
 
   /**
-   * Start recording audio from microphone with real-time dB metering
+   * Start monitoring audio with real-time dB metering
    * Implements two-tier system:
    * - Fast response (125ms): Real-time display updates
    * - Slow response (1s): Classification and storage
    *
-   * @throws AudioServiceError if recording fails or permissions not granted
+   * @throws AudioServiceError if monitoring fails or permissions not granted
    */
   async startRecording(): Promise<void> {
     if (this.isRecording) {
       throw new AudioServiceError(
         AudioErrorType.ALREADY_RECORDING,
-        'Audio recording is already in progress',
+        'Audio monitoring is already in progress',
       );
     }
 
     try {
-      // Set audio mode for recording
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
+      // Set up callback for sound level updates
+      RNSoundLevel.onNewFrame = (data: any) => {
+        this.handleSoundLevelUpdate(data);
+      };
+
+      // Start sound level monitoring
+      RNSoundLevel.start({
+        monitorInterval: this.config.meteringInterval, // 125ms
+        samplingRate: this.config.sampleRate, // 44100
       });
 
-      // Create new recording instance
-      const recording = new Audio.Recording();
-
-      // Prepare recording with metering enabled
-      await recording.prepareToRecordAsync({
-        isMeteringEnabled: true, // Enable dB metering
-        android: {
-          extension: '.m4a',
-          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
-          audioEncoder: Audio.AndroidAudioEncoder.AAC,
-          sampleRate: this.config.sampleRate,
-          numberOfChannels: this.config.channels,
-          bitRate: 128000,
-        },
-        ios: {
-          extension: '.m4a',
-          outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
-          audioQuality: Audio.IOSAudioQuality.HIGH,
-          sampleRate: this.config.sampleRate,
-          numberOfChannels: this.config.channels,
-          bitRate: 128000,
-          linearPCMBitDepth: this.config.bitsPerSample,
-          linearPCMIsBigEndian: false,
-          linearPCMIsFloat: false,
-        },
-        web: {
-          mimeType: 'audio/webm',
-          bitsPerSecond: 128000,
-        },
-      });
-
-      // Start recording
-      await recording.startAsync();
-      this.recording = recording;
       this.isRecording = true;
 
-      // Start metering loop
+      // Start aggregation loop for 1-second classification
       this.startMeteringLoop();
     } catch (error) {
       this.isRecording = false;
-      this.recording = null;
 
       const errorMessage = (error as Error).message || '';
       if (
@@ -220,23 +187,80 @@ export class AudioService {
 
       throw new AudioServiceError(
         AudioErrorType.RECORDING_FAILED,
-        'Failed to start audio recording',
+        'Failed to start audio monitoring',
         error as Error,
       );
     }
   }
 
   /**
-   * Start metering loop with two-tier time weighting system
+   * Handle incoming sound level data from native module
    *
-   * Tier 1 (Fast - 125ms): Real-time display updates
-   * - Polls metering every 125ms
-   * - Emits to real-time callbacks immediately
-   * - Provides smooth, responsive UI updates
+   * @param data - Sound level data with dB value
+   * @private
+   */
+  private handleSoundLevelUpdate(data: any): void {
+    try {
+      // Get dB value from data
+      // react-native-sound-level returns value (0-160) or db (-160 to 0)
+      const rawValue = data.value !== undefined ? data.value : data.db;
+
+      // Debug logging to understand raw values
+      console.log('[AudioService] Raw dB value from library:', rawValue);
+
+      // Normalize to 0-120 dB range for environmental monitoring
+      const dbValue = this.normalizeSoundLevel(rawValue);
+
+      console.log('[AudioService] Normalized dB value:', dbValue);
+
+      // Store for aggregation
+      this.lastDbValue = dbValue;
+
+      // TIER 1: Real-time display (Fast response - 125ms)
+      this.emitRealTimeUpdate(dbValue);
+    } catch (error) {
+      console.error('Error processing sound level data:', error);
+    }
+  }
+
+  /**
+   * Normalize sound level to 0-120 dB range
+   *
+   * @param rawValue - Raw value from sound level library
+   * @returns Normalized dB value (0-120)
+   * @private
+   */
+  private normalizeSoundLevel(rawValue: number): number {
+    // react-native-sound-level returns dBFS (decibels relative to full scale)
+    // Range: -160 dBFS (silence) to 0 dBFS (maximum)
+    // We need to map this to SPL (Sound Pressure Level) for environmental monitoring
+    //
+    // Calibration: Adjust offset based on device characteristics
+    // A quiet room should be ~20-40 dB SPL
+    // Current issue: -26 dBFS + 120 = 94 dB (too high for quiet room)
+    // Better calibration: Use larger offset to map silence to lower SPL values
+
+    if (rawValue < 0) {
+      // Map dBFS to approximate SPL
+      // Calibration: -160 dBFS → 0 dB SPL, 0 dBFS → 120 dB SPL
+      // But adjust for typical smartphone microphone sensitivity
+      // Quiet room at -26 dBFS should be ~30 dB SPL, not 94 dB
+      // So: SPL = dBFS + 56 (roughly: -26 + 56 = 30 dB)
+      const spl = rawValue + 56;
+      return Math.max(0, Math.min(120, spl));
+    }
+
+    // If value is positive (shouldn't happen with dBFS), clamp to valid range
+    return Math.max(0, Math.min(120, rawValue));
+  }
+
+  /**
+   * Start metering loop for 1-second classification aggregation
    *
    * Tier 2 (Slow - 1 second): Classification and storage
+   * - Samples current dB value every 125ms
    * - Buffers 8 readings (8 × 125ms = 1 second)
-   * - Averages readings over 1-second window
+   * - Averages readings over 1-second window using logarithmic averaging
    * - Emits to classification callbacks once per second
    * - Complies with IEC 61672 "Slow" response standard
    *
@@ -251,64 +275,34 @@ export class AudioService {
     const readingsPerSecond = this.config.classificationWindow / this.config.meteringInterval;
     // 1000ms / 125ms = 8 readings
 
-    this.meteringInterval = setInterval(async () => {
-      if (!this.recording || !this.isRecording) {
+    this.meteringInterval = setInterval(() => {
+      if (!this.isRecording) {
         return;
       }
 
       try {
-        const status = await this.recording.getStatusAsync();
+        // TIER 2: Classification (Slow response - 1 second)
+        // Buffer current reading for 1-second window
+        this.dbReadings.push(this.lastDbValue);
 
-        if (status.isRecording && status.metering !== undefined) {
-          // Convert expo-av metering to dB
-          const dbValue = this.convertMeteringToDb(status.metering);
+        // When we have a full 1-second window (8 readings)
+        if (this.dbReadings.length >= readingsPerSecond) {
+          // Calculate average dB over 1-second window
+          const avgDb = this.calculateAverageDb(this.dbReadings);
 
-          // TIER 1: Real-time display (Fast response - 125ms)
-          // Emit immediately for smooth UI updates
-          this.emitRealTimeUpdate(dbValue);
+          // Create audio sample for classification
+          const audioSample = this.createAudioSampleFromDb(avgDb);
 
-          // TIER 2: Classification (Slow response - 1 second)
-          // Buffer readings for 1-second window
-          this.dbReadings.push(dbValue);
+          // Emit to classification callbacks
+          this.emitClassification(audioSample);
 
-          // When we have a full 1-second window (8 readings)
-          if (this.dbReadings.length >= readingsPerSecond) {
-            // Calculate average dB over 1-second window
-            const avgDb = this.calculateAverageDb(this.dbReadings);
-
-            // Create audio sample for classification
-            const audioSample = this.createAudioSampleFromDb(avgDb);
-
-            // Emit to classification callbacks
-            this.emitClassification(audioSample);
-
-            // Clear buffer for next 1-second window
-            this.dbReadings = [];
-          }
+          // Clear buffer for next 1-second window
+          this.dbReadings = [];
         }
       } catch (error) {
-        console.error('Error getting metering data:', error);
+        console.error('Error in metering loop:', error);
       }
     }, this.config.meteringInterval);
-  }
-
-  /**
-   * Convert expo-av metering value to dB
-   * expo-av metering range: -160 to 0 dB (relative to full scale)
-   * We normalize to 0-120 dB range for environmental noise monitoring
-   *
-   * @param metering - Raw metering value from expo-av (-160 to 0)
-   * @returns dB value in 0-120 range
-   * @private
-   */
-  private convertMeteringToDb(metering: number): number {
-    // Clamp metering to expected range
-    const clampedMetering = Math.max(-120, Math.min(0, metering));
-
-    // Normalize to 0-120 dB range
-    const db = clampedMetering + 120;
-
-    return db;
   }
 
   /**
@@ -320,6 +314,8 @@ export class AudioService {
    * @private
    */
   private calculateAverageDb(readings: number[]): number {
+    if (readings.length === 0) return 0;
+
     // Convert dB to linear scale, average, then convert back
     // This is the correct way to average decibel values
     const linearSum = readings.reduce((sum, db) => {
@@ -352,6 +348,7 @@ export class AudioService {
       samples,
       sampleRate: this.config.sampleRate,
       timestamp: new Date(),
+      decibelLevel: db, // Pass calibrated dB value directly to UI
     };
   }
 
@@ -408,17 +405,14 @@ export class AudioService {
   }
 
   /**
-   * Stop recording audio
-   * Cleans up metering interval and recording instance
-   *
-   * @throws AudioServiceError if not currently recording
+   * Stop audio monitoring
+   * Cleans up listeners and intervals
+   * Safe to call even if not currently monitoring
    */
   async stopRecording(): Promise<void> {
+    // If not recording, just return (safe to call multiple times)
     if (!this.isRecording) {
-      throw new AudioServiceError(
-        AudioErrorType.NOT_RECORDING,
-        'No audio recording in progress',
-      );
+      return;
     }
 
     try {
@@ -431,17 +425,17 @@ export class AudioService {
       // Clear readings buffer
       this.dbReadings = [];
 
-      // Stop and unload recording
-      if (this.recording) {
-        await this.recording.stopAndUnloadAsync();
-        this.recording = null;
-      }
+      // Stop sound level monitoring
+      RNSoundLevel.stop();
+
+      // Clear callback
+      RNSoundLevel.onNewFrame = null;
 
       this.isRecording = false;
     } catch (error) {
       throw new AudioServiceError(
         AudioErrorType.RECORDING_FAILED,
-        'Failed to stop audio recording',
+        'Failed to stop audio monitoring',
         error as Error,
       );
     }
@@ -493,9 +487,9 @@ export class AudioService {
   }
 
   /**
-   * Get current recording status
+   * Get current monitoring status
    *
-   * @returns true if currently recording, false otherwise
+   * @returns true if currently monitoring, false otherwise
    */
   getRecordingStatus(): boolean {
     return this.isRecording;
@@ -512,7 +506,7 @@ export class AudioService {
 
   /**
    * Cleanup and reset the audio service
-   * Stops recording if active and removes all listeners
+   * Stops monitoring if active and removes all listeners
    */
   async cleanup(): Promise<void> {
     if (this.meteringInterval) {

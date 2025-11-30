@@ -66,8 +66,8 @@ export const HomeScreen: React.FC = () => {
   const processAudioSample = useCallback(
     (sample: AudioSample) => {
       try {
-        // 1. Calculate decibels
-        const instantDb = calculateDecibels(sample.samples);
+        // 1. Use calibrated dB value from AudioService
+        const instantDb = sample.decibelLevel;
 
         // 2. Apply smoothing
         const smoothedDb = movingAverage.add(instantDb);
