@@ -15,13 +15,19 @@
     "test:performance": "jest --testPathPattern=__performance__"
   },
   "dependencies": {
+    "@react-native-firebase/app": "^23.5.0",
+    "@react-native-firebase/auth": "^23.5.0",
+    "@react-native-firebase/firestore": "^23.5.0",
     "@react-native/new-app-screen": "0.82.0",
+    "@types/uuid": "^10.0.0",
     "buffer": "^6.0.3",
-    "expo": "^54.0.25",
-    "expo-av": "~16.0.7",
+    "expo-modules-core": "^3.0.26",
     "react": "19.1.1",
     "react-native": "0.82.0",
-    "react-native-safe-area-context": "^5.5.2"
+    "react-native-keep-awake": "^4.0.0",
+    "react-native-safe-area-context": "^5.5.2",
+    "react-native-sound-level": "^1.3.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
