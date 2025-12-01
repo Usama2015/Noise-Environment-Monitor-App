@@ -24,6 +24,8 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import Geolocation from '@react-native-community/geolocation';
 import { AudioService } from '../services/AudioService';
 import { calculateDecibels } from '../utils/DecibelCalculator';
 import { FFTProcessor } from '../utils/FFTProcessor';
@@ -37,6 +39,7 @@ import { DecibelDisplay } from '../components/DecibelDisplay';
 import type { NoiseReading } from '../components/NoiseHistory';
 import { NoiseHistory } from '../components/NoiseHistory';
 import type { AudioSample } from '../types';
+import { CAMPUS_LOCATIONS } from '../constants/locations';
 
 // Sample rate configuration (matches AudioService)
 const SAMPLE_RATE = 44100;
@@ -61,6 +64,11 @@ export const HomeScreen: React.FC = () => {
   const [currentDecibels, setCurrentDecibels] = useState(0);
   const [classification, setClassification] = useState<ClassificationResult | null>(null);
   const [readings, setReadings] = useState<NoiseReading[]>([]);
+
+  // Location selection state
+  const [selectedBuilding, setSelectedBuilding] = useState<string>('');
+  const [selectedRoom, setSelectedRoom] = useState<string>('');
+  const [availableRooms, setAvailableRooms] = useState<string[]>([]);
 
   // Process audio samples
   const processAudioSample = useCallback(
@@ -103,30 +111,108 @@ export const HomeScreen: React.FC = () => {
     [movingAverage, fftProcessor, classifier]
   );
 
-  // Start monitoring
+  // Handle building selection change
+  const handleBuildingChange = useCallback((buildingName: string) => {
+    setSelectedBuilding(buildingName);
+    setSelectedRoom(''); // Reset room when building changes
+
+    // Get rooms for selected building
+    const location = CAMPUS_LOCATIONS.find(loc => loc.name === buildingName);
+    if (location) {
+      setAvailableRooms(location.rooms);
+    } else {
+      setAvailableRooms([]);
+    }
+  }, []);
+
+  // Start monitoring with location
   const startMonitoring = async () => {
+    // Validate location selection
+    if (!selectedBuilding || !selectedRoom) {
+      Alert.alert(
+        'Location Required',
+        'Please select both building and room before starting monitoring.'
+      );
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError(null);
 
-      // Request permission
+      // Request microphone permission
       const hasPermission = await audioService.requestPermission();
       if (!hasPermission) {
         setError('Microphone permission denied. Please enable it in settings.');
+        setIsLoading(false);
         return;
       }
 
-      // Reset filters and history
-      movingAverage.reset();
-      setReadings([]);
+      // Get GPS coordinates
+      Geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          console.log('[HomeScreen] GPS coordinates:', latitude, longitude);
 
-      // Subscribe to audio samples
-      audioService.onAudioSample(processAudioSample);
+          // Set location in AudioService
+          audioService.setLocation(selectedBuilding, selectedRoom, latitude, longitude);
 
-      // Start recording
-      await audioService.startRecording();
+          // Reset filters and history
+          movingAverage.reset();
+          setReadings([]);
 
-      setIsMonitoring(true);
+          // Subscribe to audio samples
+          audioService.onAudioSample(processAudioSample);
+
+          // Start recording
+          await audioService.startRecording();
+
+          setIsMonitoring(true);
+          setIsLoading(false);
+        },
+        (geoError) => {
+          console.warn('[HomeScreen] GPS error:', geoError.message);
+
+          // Use default GMU coordinates if GPS fails
+          Alert.alert(
+            'GPS Unavailable',
+            'Using default campus coordinates. Map location may be inaccurate.',
+            [
+              {
+                text: 'Cancel',
+                style: 'cancel',
+                onPress: () => setIsLoading(false),
+              },
+              {
+                text: 'Continue Anyway',
+                onPress: async () => {
+                  // Use GMU default coordinates
+                  audioService.setLocation(
+                    selectedBuilding,
+                    selectedRoom,
+                    38.8304, // GMU latitude
+                    -77.3078  // GMU longitude
+                  );
+
+                  // Reset filters and history
+                  movingAverage.reset();
+                  setReadings([]);
+
+                  // Subscribe to audio samples
+                  audioService.onAudioSample(processAudioSample);
+
+                  // Start recording
+                  await audioService.startRecording();
+
+                  setIsMonitoring(true);
+                  setIsLoading(false);
+                },
+              },
+            ]
+          );
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+      );
     } catch (err) {
       console.error('Error starting monitoring:', err);
       setError(err instanceof Error ? err.message : 'Failed to start monitoring');
@@ -134,7 +220,6 @@ export const HomeScreen: React.FC = () => {
         'Error',
         'Failed to start monitoring. Please check microphone permissions.'
       );
-    } finally {
       setIsLoading(false);
     }
   };
@@ -199,6 +284,58 @@ export const HomeScreen: React.FC = () => {
         {/* Main content */}
         {!isLoading && (
           <>
+            {/* Location Selection Section */}
+            <View style={styles.locationSection}>
+              <Text style={styles.sectionTitle}>Select Location</Text>
+
+              <View style={styles.pickerContainer}>
+                <Text style={styles.label}>Building:</Text>
+                <View style={styles.pickerWrapper}>
+                  <Picker
+                    selectedValue={selectedBuilding}
+                    onValueChange={handleBuildingChange}
+                    style={styles.picker}
+                    enabled={!isMonitoring}
+                  >
+                    <Picker.Item label="Select Building..." value="" />
+                    {CAMPUS_LOCATIONS.map(location => (
+                      <Picker.Item
+                        key={location.id}
+                        label={location.name}
+                        value={location.name}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+
+              <View style={styles.pickerContainer}>
+                <Text style={styles.label}>Room:</Text>
+                <View style={styles.pickerWrapper}>
+                  <Picker
+                    selectedValue={selectedRoom}
+                    onValueChange={(value) => setSelectedRoom(value)}
+                    style={styles.picker}
+                    enabled={!isMonitoring && availableRooms.length > 0}
+                  >
+                    <Picker.Item label="Select Room..." value="" />
+                    {availableRooms.map(room => (
+                      <Picker.Item key={room} label={room} value={room} />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+
+              {/* Location status indicator */}
+              {selectedBuilding && selectedRoom && (
+                <View style={styles.locationStatus}>
+                  <Text style={styles.locationStatusText}>
+                    Location: {selectedBuilding} - {selectedRoom}
+                  </Text>
+                </View>
+              )}
+            </View>
+
             {/* Decibel Display */}
             <DecibelDisplay
               decibels={currentDecibels}
@@ -394,5 +531,50 @@ const styles = StyleSheet.create({
     color: '#666',
     lineHeight: 22,
     marginBottom: 8,
+  },
+  // Location picker styles
+  locationSection: {
+    marginHorizontal: 20,
+    marginTop: 20,
+    padding: 16,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 16,
+  },
+  pickerContainer: {
+    marginBottom: 12,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#666',
+    marginBottom: 6,
+  },
+  pickerWrapper: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    overflow: 'hidden',
+  },
+  picker: {
+    height: 50,
+  },
+  locationStatus: {
+    marginTop: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#E8F5E9',
+    borderRadius: 6,
+  },
+  locationStatusText: {
+    fontSize: 13,
+    color: '#2E7D32',
+    fontWeight: '500',
   },
 });

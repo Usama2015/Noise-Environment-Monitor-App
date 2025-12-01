@@ -15,9 +15,11 @@
     "test:performance": "jest --testPathPattern=__performance__"
   },
   "dependencies": {
+    "@react-native-community/geolocation": "^3.4.0",
     "@react-native-firebase/app": "^23.5.0",
     "@react-native-firebase/auth": "^23.5.0",
     "@react-native-firebase/firestore": "^23.5.0",
+    "@react-native-picker/picker": "^2.11.4",
     "@react-native/new-app-screen": "0.82.0",
     "@sayem314/react-native-keep-awake": "^1.4.0",
     "@types/uuid": "^10.0.0",
