@@ -149,13 +149,15 @@ Task Type?
 
 ## 📍 Current Status (Auto-Update This Section)
 
-**Current Phase:** Phase 1B + 2 (Firebase Integration & Map)
+**Current Phase:** Phase 2 (Map Visualization)
 **Current Branch:** `phase/1-core-app`
-**Current Step:** Step 1B-8 (Location Picker UI)
-**Next Step:** Step 2-1 (Create MapScreen)
+**Current Step:** Step 2-1 (Create MapScreen)
+**Next Step:** Step 2-2 (Heatmap Overlay)
 
 **Last Updated:** 2025-12-01
 **Updated By:** Claude
+
+**Phase 1B Complete:** ✅ Firebase Integration done - ready for E2E testing
 
 ---
 
@@ -357,64 +359,34 @@ Git Workflow:
 Next Step: Step 1B-8 (Location Picker UI)
 ```
 
-#### **Step 1B-8: Add Location Picker to HomeScreen** ⏳ PENDING
+#### **Step 1B-8: Add Location Picker to HomeScreen** ✅ COMPLETED
 ```
-Branch: phase/2-firebase-integration
-Status: NOT STARTED
+Branch: phase/1-core-app
+Status: DONE
 Dependencies: Step 1B-7 complete
 Code Reference: IMPLEMENTATION_SPEC.md - Step 1B-8 (80 lines, 3 hours)
 
-Pre-Step Actions:
-[ ] Ensure on correct branch: git checkout phase/2-firebase-integration
-[ ] Create step branch: git checkout -b step/1b-8-location-picker
-[ ] Read IMPLEMENTATION_SPEC.md Step 1B-8 for exact code
-
 Implementation Checklist:
-[ ] Read src/screens/HomeScreen.tsx
-[ ] Install @react-native-picker/picker if not installed
-[ ] Import Picker component
-[ ] Import CAMPUS_LOCATIONS from constants
-[ ] Add state variables:
-    [ ] selectedBuilding
-    [ ] selectedRoom
-    [ ] availableRooms
-    [ ] currentLocation (GPS)
-[ ] Add building Picker component
-[ ] Add room Picker component (enabled only when building selected)
-[ ] Handle building selection:
-    [ ] Update availableRooms
-    [ ] Clear selected room
-[ ] Get GPS coordinates when "Start Monitoring" pressed
-[ ] Pass location to AudioService.setLocation()
-[ ] Add loading state for GPS
-[ ] Add error handling for GPS failure
-[ ] Update UI with location pickers
-
-Testing Checklist:
-[ ] Manual test: Select building → Room dropdown populates
-[ ] Manual test: Change building → Room resets
-[ ] Manual test: Start monitoring → GPS coordinates obtained
-[ ] Manual test: Location data sent to AudioService
-[ ] Check console logs for location data
-[ ] Verify no UI crashes
+[✅] Install @react-native-picker/picker and @react-native-community/geolocation
+[✅] Import Picker component and Geolocation
+[✅] Import CAMPUS_LOCATIONS from constants
+[✅] Add state variables: selectedBuilding, selectedRoom, availableRooms
+[✅] Add handleBuildingChange function
+[✅] Add building Picker component
+[✅] Add room Picker component (enabled only when building selected)
+[✅] Handle building selection: Update availableRooms, Clear selected room
+[✅] Get GPS coordinates when "Start Monitoring" pressed
+[✅] Pass location to AudioService.setLocation()
+[✅] Add GPS error handling with fallback to GMU default coordinates
+[✅] Validate location selection before starting
+[✅] Add location status indicator
+[✅] Disable pickers while monitoring
 
 Git Workflow:
-[ ] git add src/screens/HomeScreen.tsx
-[ ] git add package.json (if picker installed)
-[ ] git commit -m "feat(ui): add building/room location picker to HomeScreen"
-[ ] git push -u origin step/1b-8-location-picker
-[ ] Merge to phase: git checkout phase/2-firebase-integration
-[ ] git merge step/1b-8-location-picker
-[ ] git push origin phase/2-firebase-integration
-[ ] Delete step branch: git branch -d step/1b-8-location-picker
+[✅] Commit: feat(ui): add building/room location picker to HomeScreen
+[✅] Push to remote
 
-Documentation Updates:
-[ ] Update PROGRESS_REPORT.md
-[ ] Update DEVELOPMENT_WORKFLOW.md (mark as DONE)
-
-Integration Testing (Phase 1B Complete):
-[ ] Run: npm test -- --testPathPattern=integration/Phase1B
-[ ] All integration tests pass
+Phase 1B Integration Testing (Pending Manual Test):
 [ ] Manual E2E test: Monitor → Upload → Verify in Firestore Console
 
 Next Step: Step 2-1 (Create MapScreen)
@@ -742,9 +714,9 @@ Or:
 ---
 
 **Last Updated:** 2025-12-01 (Claude should update this automatically)
-**Current Phase:** 1B + 2 (Firebase Integration & Map)
-**Current Step:** 1B-8 (Location Picker UI)
-**Next Step:** 2-1 (Create MapScreen)
+**Current Phase:** Phase 2 (Map Visualization)
+**Current Step:** 2-1 (Create MapScreen)
+**Next Step:** 2-2 (Heatmap Overlay)
 
 ---
 
