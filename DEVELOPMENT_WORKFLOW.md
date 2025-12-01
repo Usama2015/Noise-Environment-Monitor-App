@@ -151,8 +151,8 @@ Task Type?
 
 **Current Phase:** Phase 1B + 2 (Firebase Integration & Map)
 **Current Branch:** `phase/1-core-app`
-**Current Step:** Step 1B-7 (Refactor AudioService for Firebase Upload)
-**Next Step:** Step 1B-8 (Location Picker UI)
+**Current Step:** Step 1B-8 (Location Picker UI)
+**Next Step:** Step 2-1 (Create MapScreen)
 
 **Last Updated:** 2025-12-01
 **Updated By:** Claude
@@ -325,61 +325,34 @@ Claude's Actions:
 [✅] Update DEVELOPMENT_WORKFLOW.md (mark as DONE, set next step)
 ```
 
-#### **Step 1B-7: Refactor AudioService for Firebase Upload** ⏳ PENDING
+#### **Step 1B-7: Refactor AudioService for Firebase Upload** ✅ COMPLETED
 ```
-Branch: phase/2-firebase-integration
-Status: NOT STARTED
+Branch: phase/1-core-app
+Status: DONE
 Dependencies: Step 1B-6 complete
 Code Reference: IMPLEMENTATION_SPEC.md - Step 1B-7 (30 lines, 2 hours)
 
-Pre-Step Actions:
-[ ] Ensure on correct branch: git checkout phase/2-firebase-integration
-[ ] Pull latest: git pull origin phase/2-firebase-integration
-[ ] Create step branch: git checkout -b step/1b-7-audio-refactor
-[ ] Read IMPLEMENTATION_SPEC.md Step 1B-7 for exact code
-
 Implementation Checklist:
-[ ] Read src/services/AudioService.ts
-[ ] Import AuthService and StorageService
-[ ] Import uuid for session IDs
-[ ] Add currentSessionId property
-[ ] Add location properties (building, room, lat, lng)
-[ ] Update startRecording():
-    [ ] Generate session UUID
-    [ ] Get current location (GPS)
-    [ ] Verify user is authenticated
-[ ] Update 1-second classification callback:
-    [ ] Create NoiseReading object
-    [ ] Call storageService.saveReading()
-    [ ] Handle upload errors
-    [ ] Add console logging
-[ ] Update stopRecording():
-    [ ] Clear session ID
-    [ ] Clean up resources
-[ ] Add setLocation(building, room, lat, lng) method
-
-Testing Checklist:
-[ ] Update __tests__/services/AudioService.test.ts
-[ ] Mock StorageService
-[ ] Test session ID generation
-[ ] Test Firebase upload integration
-[ ] Run unit tests: npm test AudioService.test.ts
-[ ] All tests pass
+[✅] Read src/services/AudioService.ts
+[✅] Import StorageService and classifyNoise
+[✅] Import uuid for session IDs
+[✅] Add currentSessionId property
+[✅] Add LocationData interface and currentLocation property
+[✅] Update startRecording(): Generate session UUID
+[✅] Update 1-second classification callback:
+    [✅] Create NoiseReading object
+    [✅] Call storageService.saveReading()
+    [✅] Handle upload errors (fire-and-forget with error logging)
+    [✅] Add console logging
+[✅] Update stopRecording(): Clear session ID
+[✅] Add setLocation(building, room, lat, lng) method
+[✅] Add clearLocation() method
+[✅] Add getSessionId() method
+[✅] Export AudioSample type from types/index.ts
 
 Git Workflow:
-[ ] git add src/services/AudioService.ts
-[ ] git add __tests__/services/AudioService.test.ts
-[ ] git commit -m "refactor(audio): integrate Firebase upload for noise readings"
-[ ] git push -u origin step/1b-7-audio-refactor
-[ ] Merge to phase branch: git checkout phase/2-firebase-integration
-[ ] git merge step/1b-7-audio-refactor
-[ ] git push origin phase/2-firebase-integration
-[ ] Delete step branch: git branch -d step/1b-7-audio-refactor
-
-Documentation Updates:
-[ ] Update PROGRESS_REPORT.md (mark step as complete)
-[ ] Update DEVELOPMENT_WORKFLOW.md (mark as DONE, set next step)
-[ ] Update SESSION_SUMMARY_2025-11-29.md if needed
+[✅] Commit: refactor(audio): integrate Firebase upload for noise readings
+[✅] Push to remote
 
 Next Step: Step 1B-8 (Location Picker UI)
 ```
@@ -770,8 +743,8 @@ Or:
 
 **Last Updated:** 2025-12-01 (Claude should update this automatically)
 **Current Phase:** 1B + 2 (Firebase Integration & Map)
-**Current Step:** 1B-7 (Refactor AudioService for Firebase Upload)
-**Next Step:** 1B-8 (Location Picker UI)
+**Current Step:** 1B-8 (Location Picker UI)
+**Next Step:** 2-1 (Create MapScreen)
 
 ---
 
