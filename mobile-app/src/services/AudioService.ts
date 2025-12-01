@@ -33,7 +33,10 @@
 
 import { Platform, PermissionsAndroid } from 'react-native';
 import RNSoundLevel from 'react-native-sound-level';
-import { AudioSample } from '../types';
+import { v4 as uuidv4 } from 'uuid';
+import { AudioSample, NoiseReading } from '../types';
+import { classifyNoise } from './NoiseClassifier';
+import storageService from './StorageService';
 
 /**
  * Error types for audio service operations
@@ -73,6 +76,16 @@ interface AudioConfig {
 }
 
 /**
+ * Location data for noise readings
+ */
+interface LocationData {
+  latitude: number;
+  longitude: number;
+  building: string;
+  room: string;
+}
+
+/**
  * Callback types for different update frequencies
  */
 interface AudioCallbacks {
@@ -93,6 +106,11 @@ export class AudioService {
   private meteringInterval: NodeJS.Timeout | null = null;
   private dbReadings: number[] = []; // Buffer for 1-second window
   private lastDbValue: number = 0;
+
+  // Firebase integration properties
+  private currentSessionId: string | null = null;
+  private currentLocation: LocationData | null = null;
+
   private config: AudioConfig = {
     sampleRate: 44100, // 44.1kHz standard
     channels: 1, // Mono audio
@@ -152,6 +170,10 @@ export class AudioService {
         'Audio monitoring is already in progress',
       );
     }
+
+    // Generate new session ID for this recording session
+    this.currentSessionId = uuidv4();
+    console.log('[AudioService] Session started:', this.currentSessionId);
 
     try {
       // Set up callback for sound level updates
@@ -296,6 +318,21 @@ export class AudioService {
           // Emit to classification callbacks
           this.emitClassification(audioSample);
 
+          // Upload to Firebase if location is set
+          if (this.currentLocation && this.currentSessionId) {
+            const reading: NoiseReading = {
+              decibel: avgDb,
+              classification: classifyNoise(avgDb),
+              location: this.currentLocation,
+              sessionId: this.currentSessionId,
+            };
+
+            // Fire-and-forget upload (don't block audio monitoring)
+            storageService.saveReading(reading).catch(err => {
+              console.error('[AudioService] Firebase upload failed:', err);
+            });
+          }
+
           // Clear buffer for next 1-second window
           this.dbReadings = [];
         }
@@ -415,6 +452,9 @@ export class AudioService {
       return;
     }
 
+    // Log session end
+    console.log('[AudioService] Session ended:', this.currentSessionId);
+
     try {
       // Stop metering loop
       if (this.meteringInterval) {
@@ -430,6 +470,9 @@ export class AudioService {
 
       // Clear callback
       RNSoundLevel.onNewFrame = null;
+
+      // Clear session ID
+      this.currentSessionId = null;
 
       this.isRecording = false;
     } catch (error) {
@@ -502,6 +545,48 @@ export class AudioService {
    */
   getConfig(): Readonly<AudioConfig> {
     return { ...this.config };
+  }
+
+  /**
+   * Set the current location for noise readings
+   * Must be called before startRecording() for Firebase uploads to work
+   *
+   * @param building - Building name (e.g., "Fenwick Library")
+   * @param room - Room name (e.g., "3rd Floor Quiet Area")
+   * @param latitude - GPS latitude coordinate
+   * @param longitude - GPS longitude coordinate
+   */
+  setLocation(
+    building: string,
+    room: string,
+    latitude: number,
+    longitude: number,
+  ): void {
+    this.currentLocation = {
+      latitude,
+      longitude,
+      building,
+      room,
+    };
+    console.log('[AudioService] Location set:', this.currentLocation);
+  }
+
+  /**
+   * Clear the current location
+   * Calling this will stop Firebase uploads until setLocation is called again
+   */
+  clearLocation(): void {
+    this.currentLocation = null;
+    console.log('[AudioService] Location cleared');
+  }
+
+  /**
+   * Get current session ID (if recording)
+   *
+   * @returns Current session ID or null if not recording
+   */
+  getSessionId(): string | null {
+    return this.currentSessionId;
   }
 
   /**

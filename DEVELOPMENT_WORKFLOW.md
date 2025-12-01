@@ -150,11 +150,11 @@ Task Type?
 ## 📍 Current Status (Auto-Update This Section)
 
 **Current Phase:** Phase 1B + 2 (Firebase Integration & Map)
-**Current Branch:** `phase/1-core-app` (needs to create `phase/2-firebase-integration`)
-**Current Step:** Step 1B-6 (Firebase Setup - User's Task)
-**Next Step:** Step 1B-7 (Refactor AudioService)
+**Current Branch:** `phase/1-core-app`
+**Current Step:** Step 1B-7 (Refactor AudioService for Firebase Upload)
+**Next Step:** Step 1B-8 (Location Picker UI)
 
-**Last Updated:** 2025-11-29
+**Last Updated:** 2025-12-01
 **Updated By:** Claude
 
 ---
@@ -300,29 +300,29 @@ Checklist:
 [✅] Update PROGRESS_REPORT.md
 ```
 
-#### **Step 1B-6: Firebase Project Setup** ⏳ IN PROGRESS (USER'S TASK)
+#### **Step 1B-6: Firebase Project Setup** ✅ COMPLETED
 ```
-Branch: phase/1-core-app (or new phase/2-firebase-integration)
-Status: WAITING FOR USER
-Owner: User (not Claude)
+Branch: phase/1-core-app
+Status: DONE
+Owner: User + Claude
 
 User's Checklist:
-[ ] Create Firebase project in console
-[ ] Add Android app (package: com.noisemonitor)
-[ ] Download google-services.json
-[ ] Place in: D:\OtherDevelopment\INFS\mobile-app\android\app\google-services.json
-[ ] Enable Anonymous Authentication
-[ ] Create Firestore database (test mode)
-[ ] Set Firestore security rules
-[ ] Notify Claude when complete
+[✅] Create Firebase project in console (SWE699Lec12)
+[✅] Add Android app (package: com.noisemonitor)
+[✅] Download google-services.json
+[✅] Place in: D:\OtherDevelopment\INFS\mobile-app\android\app\google-services.json
+[✅] Enable Anonymous Authentication
+[✅] Create Firestore database (test mode)
+[ ] Set Firestore security rules (optional - using test mode)
 
-Claude's Actions After User Completes:
-[ ] Verify google-services.json exists: ls android/app/google-services.json
-[ ] Create new branch: git checkout -b phase/2-firebase-integration
-[ ] Commit: chore(firebase): add google-services.json configuration
-[ ] Push to remote
-[ ] Update PROGRESS_REPORT.md
-[ ] Update DEVELOPMENT_WORKFLOW.md (mark as DONE, set next step)
+Claude's Actions:
+[✅] Verify google-services.json exists
+[✅] Add Google Services Gradle plugin to build.gradle files
+[✅] Replace deprecated react-native-keep-awake with @sayem314/react-native-keep-awake
+[✅] Verify Android build works
+[✅] Commit: chore(firebase): add Firebase project configuration
+[✅] Push to remote
+[✅] Update DEVELOPMENT_WORKFLOW.md (mark as DONE, set next step)
 ```
 
 #### **Step 1B-7: Refactor AudioService for Firebase Upload** ⏳ PENDING
@@ -768,10 +768,10 @@ Or:
 
 ---
 
-**Last Updated:** 2025-11-29 (Claude should update this automatically)
+**Last Updated:** 2025-12-01 (Claude should update this automatically)
 **Current Phase:** 1B + 2 (Firebase Integration & Map)
-**Current Step:** 1B-6 (Firebase Setup - User's Task)
-**Next Step:** 1B-7 (Refactor AudioService)
+**Current Step:** 1B-7 (Refactor AudioService for Firebase Upload)
+**Next Step:** 1B-8 (Location Picker UI)
 
 ---
 

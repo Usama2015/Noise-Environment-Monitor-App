@@ -82,3 +82,14 @@ export interface LocationCoordinates {
   accuracy: number;
   timestamp: Date;
 }
+
+/**
+ * Audio sample data for classification
+ * Used by AudioService for 1-second averaged samples
+ */
+export interface AudioSample {
+  samples: Float32Array;
+  sampleRate: number;
+  timestamp: Date;
+  decibelLevel: number;
+}
