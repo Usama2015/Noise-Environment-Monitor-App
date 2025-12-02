@@ -173,7 +173,6 @@ export class AudioService {
 
     // Generate new session ID for this recording session
     this.currentSessionId = uuidv4();
-    console.log('[AudioService] Session started:', this.currentSessionId);
 
     try {
       // Set up callback for sound level updates
@@ -183,7 +182,7 @@ export class AudioService {
 
       // Start sound level monitoring
       RNSoundLevel.start({
-        monitorInterval: this.config.meteringInterval, // 125ms
+        monitoringInterval: this.config.meteringInterval, // 125ms
         samplingRate: this.config.sampleRate, // 44100
       });
 
@@ -227,13 +226,8 @@ export class AudioService {
       // react-native-sound-level returns value (0-160) or db (-160 to 0)
       const rawValue = data.value !== undefined ? data.value : data.db;
 
-      // Debug logging to understand raw values
-      console.log('[AudioService] Raw dB value from library:', rawValue);
-
       // Normalize to 0-120 dB range for environmental monitoring
       const dbValue = this.normalizeSoundLevel(rawValue);
-
-      console.log('[AudioService] Normalized dB value:', dbValue);
 
       // Store for aggregation
       this.lastDbValue = dbValue;
@@ -452,9 +446,6 @@ export class AudioService {
       return;
     }
 
-    // Log session end
-    console.log('[AudioService] Session ended:', this.currentSessionId);
-
     try {
       // Stop metering loop
       if (this.meteringInterval) {
@@ -468,8 +459,8 @@ export class AudioService {
       // Stop sound level monitoring
       RNSoundLevel.stop();
 
-      // Clear callback
-      RNSoundLevel.onNewFrame = null;
+      // Clear callback (using empty function to satisfy type)
+      RNSoundLevel.onNewFrame = () => {};
 
       // Clear session ID
       this.currentSessionId = null;
@@ -568,7 +559,6 @@ export class AudioService {
       building,
       room,
     };
-    console.log('[AudioService] Location set:', this.currentLocation);
   }
 
   /**
@@ -577,7 +567,6 @@ export class AudioService {
    */
   clearLocation(): void {
     this.currentLocation = null;
-    console.log('[AudioService] Location cleared');
   }
 
   /**

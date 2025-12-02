@@ -156,8 +156,6 @@ export const HomeScreen: React.FC = () => {
       Geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          console.log('[HomeScreen] GPS coordinates:', latitude, longitude);
-
           // Set location in AudioService
           audioService.setLocation(selectedBuilding, selectedRoom, latitude, longitude);
 
@@ -175,8 +173,6 @@ export const HomeScreen: React.FC = () => {
           setIsLoading(false);
         },
         (geoError) => {
-          console.warn('[HomeScreen] GPS error:', geoError.message);
-
           // Use default GMU coordinates if GPS fails
           Alert.alert(
             'GPS Unavailable',

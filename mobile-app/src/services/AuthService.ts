@@ -22,8 +22,6 @@ export class AuthService {
       const userCredential = await auth().signInAnonymously();
       this.currentUserId = userCredential.user.uid;
 
-      console.log('[AuthService] Signed in anonymously. User ID:', this.currentUserId);
-
       return this.currentUserId;
     } catch (error) {
       console.error('[AuthService] Anonymous sign-in failed:', error);
@@ -70,7 +68,6 @@ export class AuthService {
     try {
       await auth().signOut();
       this.currentUserId = null;
-      console.log('[AuthService] Signed out');
     } catch (error) {
       console.error('[AuthService] Sign-out failed:', error);
       throw new Error('Failed to sign out');
