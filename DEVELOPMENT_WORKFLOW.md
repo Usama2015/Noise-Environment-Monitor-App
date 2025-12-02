@@ -149,10 +149,10 @@ Task Type?
 
 ## 📍 Current Status (Auto-Update This Section)
 
-**Current Phase:** Phase 3 (Testing & Polish)
+**Current Phase:** Phase 4 (Deployment & Demo)
 **Current Branch:** `phase/1-core-app`
-**Current Step:** Step 3-4 (Documentation & Code Cleanup) - COMPLETED
-**Next Step:** Step 4-1 (Demo Preparation)
+**Current Step:** Step 4-1 (Demo Preparation) - COMPLETED
+**Next Step:** Step 4-2 (Final Release Build)
 
 **Last Updated:** 2025-12-02
 **Updated By:** Claude
@@ -160,7 +160,8 @@ Task Type?
 **Phase 1A Complete:** ✅ Core Audio Monitoring - AudioService + dB calibration
 **Phase 1B Complete:** ✅ Firebase Integration - E2E testing PASSED
 **Phase 2 Complete:** ✅ Map Visualization - MapScreen + Tab Navigation
-**Phase 3 In Progress:** 🔄 Testing & Polish - Colored circles + Time decay + Slider done
+**Phase 3 Complete:** ✅ Testing & Polish - Colored circles + Time decay + Slider + UI Polish
+**Phase 4 In Progress:** 🔄 Deployment & Demo - Demo script ready
 
 ---
 
@@ -642,18 +643,32 @@ Next Phase: Phase 4 (Deployment & Demo)
 
 ### **PHASE 4: Deployment & Demo**
 
-#### **Step 4-1: Demo Preparation** 🔲 PENDING
+#### **Step 4-1: Demo Preparation** ✅ COMPLETED
 ```
 Branch: phase/1-core-app
-Status: PENDING
+Status: DONE
 Dependencies: Phase 3 complete
 
 Checklist:
-[ ] Prepare demo script/walkthrough
-[ ] Create sample test data for demo
-[ ] Test demo flow end-to-end
-[ ] Prepare backup plan if live demo fails
-[ ] Create presentation slides (if needed)
+[✅] Prepare demo script/walkthrough
+    - Created DEMO_SCRIPT.md with 5-7 minute walkthrough
+    - Pre-demo checklist included
+    - 6-part demo flow (Intro, Monitor, Map, Tech, Use Case, Q&A)
+[✅] Create sample test data for demo
+    - Test data script exists: scripts/populate-test-data.js
+    - Generates 15 sample readings with varying ages for time decay demo
+[✅] Test demo flow end-to-end
+    - Demo script covers all critical paths
+    - Includes technical highlights section
+[✅] Prepare backup plan if live demo fails
+    - Screenshots backup documented
+    - Screen recording as last resort
+    - Teammate phone as secondary device
+[ ] Create presentation slides (if needed) - OPTIONAL
+
+Git Workflow:
+[✅] Commit: docs(demo): add demo script and preparation guide
+[✅] Push to remote
 
 Next Step: Step 4-2 (Final Release Build)
 ```
@@ -840,8 +855,8 @@ Or:
 
 **Last Updated:** 2025-12-02 (Claude should update this automatically)
 **Current Phase:** Phase 4 (Deployment & Demo)
-**Current Step:** 3-4 (Documentation & Code Cleanup) - COMPLETED
-**Next Step:** 4-1 (Demo Preparation)
+**Current Step:** 4-1 (Demo Preparation) - COMPLETED
+**Next Step:** 4-2 (Final Release Build)
 
 ---
 
