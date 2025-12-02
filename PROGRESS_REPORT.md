@@ -10,10 +10,10 @@
 
 ## 📊 Project Status Overview
 
-**Current Phase:** Phase 1B - Firebase Integration (In Progress)
-**Overall Progress:** 35% Complete
+**Current Phase:** Phase 2 - Map Visualization (Starting)
+**Overall Progress:** 50% Complete
 **On Schedule:** ✅ Yes
-**Blockers:** None - Awaiting Firebase project setup
+**Blockers:** None - Phase 1B Complete
 
 **Major Architecture Change (Nov 29):**
 - Pivoted from local SQLite storage to Firebase Firestore (cloud-first)
@@ -28,8 +28,8 @@
 | Phase | Status | Progress | Notes |
 |-------|--------|----------|-------|
 | **Phase 1A:** Core Audio Monitoring | ✅ Completed | 100% | AudioService + dB calibration working |
-| **Phase 1B:** Firebase Integration | 🔄 In Progress | 60% | Auth & Storage services created, awaiting Firebase setup |
-| **Phase 2:** Location & Map Visualization | 🔲 Not Started | 0% | GPS + Heatmap on Google Maps |
+| **Phase 1B:** Firebase Integration | ✅ Completed | 100% | E2E tested - Monitor → Upload → Firestore verified |
+| **Phase 2:** Location & Map Visualization | 🔄 In Progress | 0% | GPS + Heatmap on Google Maps |
 | **Phase 3:** Testing & Polish | 🔲 Not Started | 0% | Multi-device testing, UI polish |
 | **Phase 4:** Deployment & Demo | 🔲 Not Started | 0% | Final presentation preparation |
 
