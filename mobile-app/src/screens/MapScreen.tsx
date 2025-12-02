@@ -11,19 +11,35 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Slider from '@react-native-community/slider';
-import MapView, { Heatmap, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Circle, PROVIDER_GOOGLE } from 'react-native-maps';
 import { StorageService } from '../services/StorageService';
-import type { DecayedReading, HeatmapConfig } from '../types';
-import { DEFAULT_HEATMAP_CONFIG } from '../types';
+import type { DecayedReading, HeatmapConfig } from '../types/index';
+import { DEFAULT_HEATMAP_CONFIG } from '../types/index';
 
 // Time window bounds (in minutes)
 const MIN_TIME_WINDOW = 1;
 const MAX_TIME_WINDOW = 60;
 
-interface HeatmapPoint {
+// Noise level color mapping
+const getNoiseColor = (decibel: number): string => {
+  if (decibel < 40) return '#0000FF'; // Blue - Quiet
+  if (decibel < 60) return '#00FF00'; // Green - Normal
+  if (decibel < 80) return '#FFFF00'; // Yellow - Moderate
+  return '#FF0000'; // Red - Noisy
+};
+
+// Get opacity based on decay weight (older = more transparent)
+const getOpacity = (decayedWeight: number): number => {
+  // decayedWeight is 0-1, map to 0.3-0.7 opacity range
+  return 0.3 + (decayedWeight * 0.4);
+};
+
+interface NoiseCircle {
   latitude: number;
   longitude: number;
-  weight?: number;
+  decibel: number;
+  decayedWeight: number;
+  key: string;
 }
 
 // GMU campus center coordinates
@@ -38,7 +54,7 @@ const storageService = new StorageService();
 
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
-  const [heatmapPoints, setHeatmapPoints] = useState<HeatmapPoint[]>([]);
+  const [noiseCircles, setNoiseCircles] = useState<NoiseCircle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [timeWindowMinutes, setTimeWindowMinutes] = useState(DEFAULT_HEATMAP_CONFIG.timeWindowMinutes);
 
@@ -51,24 +67,29 @@ export default function MapScreen() {
   }), [timeWindowMinutes]);
 
   useEffect(() => {
-    console.log('[MapScreen] Subscribing to heatmap data with decay...');
+    console.log('[MapScreen] Subscribing to noise data with decay...');
     console.log('[MapScreen] Config:', heatmapConfig);
     setIsLoading(true);
 
-    // Subscribe to real-time heatmap data with time decay
+    // Subscribe to real-time noise data with time decay
     const unsubscribe = storageService.subscribeToHeatmapWithDecay(
       (readings: DecayedReading[]) => {
         console.log('[MapScreen] Received decayed readings:', readings.length);
 
-        // Transform decayed readings to heatmap points
-        // Use the decayedWeight which accounts for age and decay
-        const points = readings.map(reading => ({
-          latitude: reading.latitude,
-          longitude: reading.longitude,
-          weight: reading.decayedWeight, // Already normalized with decay applied
-        }));
+        // Transform readings to noise circles with color based on dB level
+        const circles = readings.map((reading, index) => {
+          const color = getNoiseColor(reading.decibel);
+          console.log(`[MapScreen] Reading ${index}: ${reading.decibel.toFixed(1)} dB -> ${color}`);
+          return {
+            latitude: reading.latitude,
+            longitude: reading.longitude,
+            decibel: reading.decibel,
+            decayedWeight: reading.decayedWeight,
+            key: `${reading.building}-${reading.room}-${index}`,
+          };
+        });
 
-        setHeatmapPoints(points);
+        setNoiseCircles(circles);
         setIsLoading(false);
       },
       heatmapConfig
@@ -76,7 +97,7 @@ export default function MapScreen() {
 
     // Cleanup subscription on unmount or when config changes
     return () => {
-      console.log('[MapScreen] Unsubscribing from heatmap data');
+      console.log('[MapScreen] Unsubscribing from noise data');
       unsubscribe();
     };
   }, [heatmapConfig]);
@@ -95,18 +116,20 @@ export default function MapScreen() {
         showsUserLocation={true}
         showsMyLocationButton={true}
       >
-        {heatmapPoints.length > 0 && (
-          <Heatmap
-            points={heatmapPoints}
-            radius={40}
-            opacity={0.7}
-            gradient={{
-              colors: ['#0000FF', '#00FF00', '#FFFF00', '#FF0000'],
-              startPoints: [0.2, 0.4, 0.6, 1.0],
-              colorMapSize: 256,
+        {/* Render noise circles - color based on dB level, opacity based on age */}
+        {noiseCircles.map(circle => (
+          <Circle
+            key={circle.key}
+            center={{
+              latitude: circle.latitude,
+              longitude: circle.longitude,
             }}
+            radius={5} // 5 meters radius
+            fillColor={getNoiseColor(circle.decibel) + Math.round(getOpacity(circle.decayedWeight) * 255).toString(16).padStart(2, '0')}
+            strokeColor={getNoiseColor(circle.decibel)}
+            strokeWidth={2}
           />
-        )}
+        ))}
       </MapView>
 
       {/* Data count indicator and time window slider */}
@@ -114,8 +137,8 @@ export default function MapScreen() {
         <Text style={styles.statusText}>
           {isLoading
             ? 'Loading noise data...'
-            : heatmapPoints.length > 0
-              ? `${heatmapPoints.length} locations (last ${timeWindowMinutes} min)`
+            : noiseCircles.length > 0
+              ? `${noiseCircles.length} locations (last ${timeWindowMinutes} min)`
               : `No noise data in the last ${timeWindowMinutes} min`}
         </Text>
 
