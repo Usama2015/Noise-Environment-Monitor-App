@@ -8,7 +8,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Slider from '@react-native-community/slider';
 import MapView, { Circle, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -20,12 +20,12 @@ import { DEFAULT_HEATMAP_CONFIG } from '../types/index';
 const MIN_TIME_WINDOW = 1;
 const MAX_TIME_WINDOW = 60;
 
-// Noise level color mapping
+// Noise level color mapping (Material Design colors for better visibility)
 const getNoiseColor = (decibel: number): string => {
-  if (decibel < 40) return '#0000FF'; // Blue - Quiet
-  if (decibel < 60) return '#00FF00'; // Green - Normal
-  if (decibel < 80) return '#FFFF00'; // Yellow - Moderate
-  return '#FF0000'; // Red - Noisy
+  if (decibel < 40) return '#2196F3'; // Material Blue - Quiet
+  if (decibel < 60) return '#4CAF50'; // Material Green - Normal
+  if (decibel < 80) return '#FFC107'; // Material Amber - Moderate
+  return '#F44336'; // Material Red - Noisy
 };
 
 // Get opacity based on decay weight (older = more transparent)
@@ -67,27 +67,19 @@ export default function MapScreen() {
   }), [timeWindowMinutes]);
 
   useEffect(() => {
-    console.log('[MapScreen] Subscribing to noise data with decay...');
-    console.log('[MapScreen] Config:', heatmapConfig);
     setIsLoading(true);
 
     // Subscribe to real-time noise data with time decay
     const unsubscribe = storageService.subscribeToHeatmapWithDecay(
       (readings: DecayedReading[]) => {
-        console.log('[MapScreen] Received decayed readings:', readings.length);
-
         // Transform readings to noise circles with color based on dB level
-        const circles = readings.map((reading, index) => {
-          const color = getNoiseColor(reading.decibel);
-          console.log(`[MapScreen] Reading ${index}: ${reading.decibel.toFixed(1)} dB -> ${color}`);
-          return {
-            latitude: reading.latitude,
-            longitude: reading.longitude,
-            decibel: reading.decibel,
-            decayedWeight: reading.decayedWeight,
-            key: `${reading.building}-${reading.room}-${index}`,
-          };
-        });
+        const circles = readings.map((reading, index) => ({
+          latitude: reading.latitude,
+          longitude: reading.longitude,
+          decibel: reading.decibel,
+          decayedWeight: reading.decayedWeight,
+          key: `${reading.building}-${reading.room}-${index}`,
+        }));
 
         setNoiseCircles(circles);
         setIsLoading(false);
@@ -97,7 +89,6 @@ export default function MapScreen() {
 
     // Cleanup subscription on unmount or when config changes
     return () => {
-      console.log('[MapScreen] Unsubscribing from noise data');
       unsubscribe();
     };
   }, [heatmapConfig]);
@@ -134,13 +125,16 @@ export default function MapScreen() {
 
       {/* Data count indicator and time window slider */}
       <View style={[styles.statusBar, { top: insets.top + 10 }]}>
-        <Text style={styles.statusText}>
-          {isLoading
-            ? 'Loading noise data...'
-            : noiseCircles.length > 0
-              ? `${noiseCircles.length} locations (last ${timeWindowMinutes} min)`
-              : `No noise data in the last ${timeWindowMinutes} min`}
-        </Text>
+        <View style={styles.statusRow}>
+          {isLoading && <ActivityIndicator size="small" color="#4CAF50" style={styles.spinner} />}
+          <Text style={styles.statusText}>
+            {isLoading
+              ? 'Loading noise data...'
+              : noiseCircles.length > 0
+                ? `${noiseCircles.length} locations (last ${timeWindowMinutes} min)`
+                : `No noise data in the last ${timeWindowMinutes} min`}
+          </Text>
+        </View>
 
         {/* Time Window Slider */}
         <View style={styles.sliderContainer}>
@@ -164,19 +158,19 @@ export default function MapScreen() {
       <View style={[styles.legend, { bottom: 20 }]}>
         <Text style={styles.legendTitle}>Noise Level</Text>
         <View style={styles.legendRow}>
-          <View style={[styles.legendColor, { backgroundColor: '#0000FF' }]} />
+          <View style={[styles.legendColor, { backgroundColor: '#2196F3' }]} />
           <Text style={styles.legendText}>Quiet (0-40 dB)</Text>
         </View>
         <View style={styles.legendRow}>
-          <View style={[styles.legendColor, { backgroundColor: '#00FF00' }]} />
+          <View style={[styles.legendColor, { backgroundColor: '#4CAF50' }]} />
           <Text style={styles.legendText}>Normal (40-60 dB)</Text>
         </View>
         <View style={styles.legendRow}>
-          <View style={[styles.legendColor, { backgroundColor: '#FFFF00' }]} />
+          <View style={[styles.legendColor, { backgroundColor: '#FFC107' }]} />
           <Text style={styles.legendText}>Moderate (60-80 dB)</Text>
         </View>
         <View style={styles.legendRow}>
-          <View style={[styles.legendColor, { backgroundColor: '#FF0000' }]} />
+          <View style={[styles.legendColor, { backgroundColor: '#F44336' }]} />
           <Text style={styles.legendText}>Noisy (80+ dB)</Text>
         </View>
       </View>
@@ -203,6 +197,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  spinner: {
+    marginRight: 8,
   },
   statusText: {
     fontSize: 14,

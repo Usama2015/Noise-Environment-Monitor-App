@@ -402,16 +402,16 @@ export const HomeScreen: React.FC = () => {
               <View style={styles.infoContainer}>
                 <Text style={styles.infoTitle}>How to use:</Text>
                 <Text style={styles.infoText}>
-                  1. Tap "Start Monitoring" to begin
+                  1. Select your building and room above
                 </Text>
                 <Text style={styles.infoText}>
-                  2. Grant microphone permission when prompted
+                  2. Tap "Start Monitoring" to begin
                 </Text>
                 <Text style={styles.infoText}>
                   3. See real-time noise levels and classification
                 </Text>
                 <Text style={styles.infoText}>
-                  4. View history of recent readings
+                  4. View the Campus Map tab to see all readings
                 </Text>
               </View>
             )}
