@@ -9,12 +9,19 @@
  */
 
 import React, { useEffect } from 'react';
-import { StatusBar, StyleSheet, View } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from 'react-native';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { HomeScreen } from './src/screens/HomeScreen';
+import MapScreen from './src/screens/MapScreen';
 import authService from './src/services/AuthService';
 
-function App() {
+const Tab = createBottomTabNavigator();
+
+function AppContent() {
+  const insets = useSafeAreaInsets();
   // Sign in anonymously on app startup
   useEffect(() => {
     const initAuth = async () => {
@@ -34,20 +41,60 @@ function App() {
   }, []);
 
   return (
-    <SafeAreaProvider>
+    <>
       <StatusBar barStyle="light-content" backgroundColor="#4CAF50" />
-      <View style={styles.container}>
-        <HomeScreen />
-      </View>
-    </SafeAreaProvider>
+      <NavigationContainer>
+        <Tab.Navigator
+          screenOptions={{
+            tabBarActiveTintColor: '#4CAF50',
+            tabBarInactiveTintColor: '#666',
+            headerShown: false,
+            tabBarStyle: {
+              backgroundColor: '#FFFFFF',
+              borderTopWidth: 1,
+              borderTopColor: '#E0E0E0',
+              paddingBottom: insets.bottom + 5,
+              paddingTop: 5,
+              height: 60 + insets.bottom,
+            },
+            tabBarLabelStyle: {
+              fontSize: 12,
+              fontWeight: '500',
+            },
+          }}
+        >
+          <Tab.Screen
+            name="Monitor"
+            component={HomeScreen}
+            options={{
+              title: 'Monitor',
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="mic" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tab.Screen
+            name="Map"
+            component={MapScreen}
+            options={{
+              title: 'Campus Map',
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="map" size={size} color={color} />
+              ),
+            }}
+          />
+        </Tab.Navigator>
+      </NavigationContainer>
+    </>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-});
+function App() {
+  return (
+    <SafeAreaProvider>
+      <AppContent />
+    </SafeAreaProvider>
+  );
+}
 
 export default App;

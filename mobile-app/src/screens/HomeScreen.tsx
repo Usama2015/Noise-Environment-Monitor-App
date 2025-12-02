@@ -24,6 +24,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Picker } from '@react-native-picker/picker';
 import Geolocation from '@react-native-community/geolocation';
 import { AudioService } from '../services/AudioService';
@@ -51,6 +52,9 @@ const MOVING_AVG_WINDOW = 5;
  * HomeScreen component
  */
 export const HomeScreen: React.FC = () => {
+  // Get safe area insets for proper padding
+  const insets = useSafeAreaInsets();
+
   // Services (initialized once)
   const [audioService] = useState(() => new AudioService());
   const [movingAverage] = useState(() => new MovingAverageFilter(MOVING_AVG_WINDOW));
@@ -261,7 +265,7 @@ export const HomeScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
           <Text style={styles.title}>Noise Monitor</Text>
           <Text style={styles.subtitle}>Environmental Sound Analysis</Text>
         </View>
@@ -430,7 +434,6 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   header: {
-    paddingTop: 60,
     paddingBottom: 20,
     paddingHorizontal: 20,
     backgroundColor: '#4CAF50',
