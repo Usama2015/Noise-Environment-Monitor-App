@@ -1,7 +1,7 @@
 # Noise Environment Monitor App - Project Context
 
-**Last Updated:** 2025-10-14
-**Version:** 1.0.0
+**Last Updated:** 2025-10-15
+**Version:** 1.2.0
 **Status:** Planning Phase
 
 ---
@@ -115,8 +115,9 @@ INFS/
 ### **Mobile App (Phase 1 & 2)**
 - **Framework:** React Native (cross-platform iOS/Android)
 - **Language:** TypeScript
-- **Audio Processing:** react-native-audio, expo-av
-- **Signal Processing:** Custom FFT implementation or Web Audio API
+- **Audio Processing:** expo-av with dB metering (Android 14 compatible)
+- **Time Weighting:** IEC 61672 compliant (125ms Fast, 1-second Slow)
+- **Signal Processing:** No FFT required - uses built-in metering
 - **GPS/Location:** react-native-geolocation, expo-location
 - **Maps/Heatmap:** react-native-maps, custom heatmap overlay
 - **State Management:** React Context API / Redux Toolkit
@@ -130,11 +131,229 @@ INFS/
 - **Authentication:** JWT tokens
 - **Deployment:** Railway, Render, or AWS
 
-### **ML/Signal Processing**
-- **FFT:** Custom implementation or FFT.js
-- **Classification:** TensorFlow Lite / ONNX for on-device inference
-- **Training:** Python (scikit-learn, TensorFlow) for model training
-- **Feature Extraction:** MFCC, spectral features
+### **Audio Processing & Classification**
+- **dB Metering:** expo-av built-in metering (no FFT required)
+- **Time Weighting:** IEC 61672 standard (Fast: 125ms, Slow: 1 second)
+- **Averaging:** Logarithmic dB averaging (mathematically correct)
+- **Classification:** Threshold-based on 1-second averaged dB values
+- **Future ML:** TensorFlow Lite / ONNX for advanced classification (Phase 3)
+
+---
+
+## 🏗️ Audio Processing Architecture
+
+### **Evolution of Architecture**
+
+#### **Phase 1: Original Design (Deprecated)**
+```
+Microphone → PCM samples → FFT → Classification
+```
+**Issues:**
+- react-native-audio-record incompatible with Android 14
+- Complex FFT processing
+- High battery consumption
+- Not standards-compliant
+
+#### **Phase 2: Current Design (IEC 61672 Compliant)**
+```
+Microphone → expo-av metering (125ms) → Buffer (8 readings) → Average (1 sec) → Classify
+          ↓
+    Real-time UI (125ms updates)
+          ↓
+    Classification & Storage (1-second intervals)
+```
+
+**Benefits:**
+- ✅ **IEC 61672-1:2013 Compliant** - International sound level meter standard
+- ✅ **ISO 1996 Compliant** - Environmental noise measurement standard
+- ✅ **Android 14 Compatible** - Works with latest Android
+- ✅ **Battery Efficient** - 60 classifications/min (vs 600 with 100ms)
+- ✅ **ML Ready** - 1-second windows match TensorFlow Lite audio models
+- ✅ **Accurate** - Logarithmic dB averaging (mathematically correct)
+- ✅ **Responsive** - 125ms UI updates feel instantaneous
+
+### **Two-Tier Time Weighting System**
+
+#### **Tier 1: Fast Response (125ms)**
+- **Standard:** IEC 61672 "Fast" time weighting
+- **Purpose:** Real-time UI display updates
+- **Frequency:** 8 updates per second
+- **Use Case:** Smooth needle movement, live dB value
+- **Callback:** `audioService.onRealTimeUpdate(dbValue => {...})`
+
+#### **Tier 2: Slow Response (1 second)**
+- **Standard:** IEC 61672 "Slow" time weighting
+- **Purpose:** Noise classification and data storage
+- **Frequency:** 1 update per second
+- **Averaging:** Logarithmic (8 readings × 125ms = 1 second)
+- **Use Case:** Stable classification, historical data
+- **Callback:** `audioService.onAudioSample(sample => {...})`
+
+### **Time Weighting Standards Compliance**
+
+| Standard | Time Constant | Our Implementation | Purpose |
+|----------|--------------|-------------------|---------|
+| IEC 61672 "Fast" | 125ms | ✅ Real-time metering | UI updates |
+| IEC 61672 "Slow" | 1000ms | ✅ 1-second averaging | Classification |
+| ISO 1996 | ≤1 second | ✅ 1-second sampling | Environmental monitoring |
+| ML Models | 1 second | ✅ Compatible | Future ML integration |
+
+### **Logarithmic dB Averaging**
+
+Decibels are logarithmic, so simple arithmetic averaging is incorrect:
+
+```typescript
+// ❌ WRONG: Arithmetic average
+avgDb = (60 + 70) / 2 = 65 dB
+
+// ✅ CORRECT: Logarithmic average
+linearSum = 10^(60/10) + 10^(70/10)  // = 10^6 + 10^7
+linearAverage = linearSum / 2          // = 5.5 × 10^6
+avgDb = 10 × log10(linearAverage)      // = 67.4 dB
+```
+
+Our implementation:
+```typescript
+private calculateAverageDb(readings: number[]): number {
+  const linearSum = readings.reduce((sum, db) =>
+    sum + Math.pow(10, db / 10), 0);
+  const linearAverage = linearSum / readings.length;
+  return 10 * Math.log10(linearAverage);
+}
+```
+
+### **Testing & Quality Assurance**
+- **Unit Testing:** Jest (>80% coverage target)
+- **Component Testing:** React Native Testing Library (>75% coverage)
+- **Integration Testing:** Jest + Supertest (>60% coverage)
+- **E2E Testing:** Detox (critical user flows)
+- **Performance Testing:** React Native Performance, Android Profiler
+- **API Testing:** Supertest, Mock Service Worker (MSW)
+- **CI/CD:** GitHub Actions for automated testing
+
+---
+
+## 🧪 Testing Methodology
+
+**Testing Philosophy:** Test early, test often, automate everything possible
+
+### **Testing Pyramid (70-25-5 Distribution)**
+
+```
+       ╱╲
+      ╱E2E╲         ← 5% - Critical user journeys
+     ╱─────╲
+    ╱  Integ╲       ← 25% - Component interactions, API flows
+   ╱─────────╲
+  ╱Unit Tests╲     ← 70% - Foundation (utils, services, components)
+ ╱────────────╲
+```
+
+### **Testing Levels**
+
+#### **1. Unit Testing (70% of tests)**
+- **What:** Test individual functions, utils, services in isolation
+- **Tools:** Jest
+- **Examples:** DecibelCalculator, FFTProcessor, MovingAverageFilter, Classifier
+- **Coverage Target:** >80%
+- **Run:** `npm test`
+
+#### **2. Component Testing (React Native)**
+- **What:** Test React components with mocked dependencies
+- **Tools:** React Native Testing Library, @testing-library/jest-native
+- **Examples:** DecibelDisplay, ClassificationLabel, HomeScreen, MapScreen
+- **Coverage Target:** >75%
+- **Run:** `npm test -- --testPathPattern=components`
+
+#### **3. Integration Testing (25% of tests)**
+- **Mobile Integration:** Audio capture → Processing → Classification pipeline
+- **FE/BE Integration:** API request → Backend → Response → UI update
+- **Data Flow:** Location service → Storage → Map rendering
+- **Coverage Target:** >60%
+- **Run:** `npm run test:integration`
+
+#### **4. End-to-End Testing (5% of tests)**
+- **What:** Complete user journeys on real devices/emulators
+- **Tools:** Detox
+- **Examples:** Onboarding flow, Monitoring session, Map navigation
+- **Run:** `npm run test:e2e`
+
+#### **5. Performance Testing**
+- **Metrics:** Launch time (<3s), Processing latency (<500ms), Battery (<5%/hr)
+- **Tools:** React Native Performance Monitor, Android Profiler, Xcode Instruments
+
+### **Testing Requirements for Each Development Session**
+
+**Before committing ANY code:**
+- ✅ Write unit tests for new functions/services
+- ✅ Write component tests for new UI components
+- ✅ All existing tests must pass
+- ✅ Code coverage must not decrease
+- ✅ Run `npm run lint` and fix all errors
+
+**After completing each step (1.1, 1.2, etc.):**
+- ✅ Write integration tests for the complete flow
+- ✅ Manual smoke test on device/emulator
+- ✅ Update test documentation
+
+**At end of each phase:**
+- ✅ Run full E2E test suite
+- ✅ Performance profiling
+- ✅ Manual testing on 2+ devices
+- ✅ Update coverage reports in PROGRESS_REPORT.md
+
+### **FE/BE API Flow Testing (Phase 3)**
+
+**Backend API Tests:**
+```typescript
+// Test API endpoints
+POST /api/readings → Should save noise reading
+GET /api/readings → Should return filtered data
+GET /api/heatmap → Should aggregate multi-user data
+```
+
+**Frontend-Backend Integration:**
+```typescript
+// Test complete data flow
+Mobile → Submit reading → API → Database → Confirmation → UI update
+Mobile → Request heatmap → API → Aggregate data → Response → Map render
+Offline → Queue locally → Network returns → Sync to backend → Verify
+```
+
+**Tools:** Supertest (API), Mock Service Worker (mock responses), Jest
+
+### **CI/CD Automation**
+
+**GitHub Actions Workflow:**
+```yaml
+on: [push, pull_request]
+jobs:
+  - Unit tests (run on every commit)
+  - Integration tests (run on PR)
+  - E2E tests (run on merge to develop)
+  - Coverage report (upload to Codecov)
+```
+
+**Quality Gates:**
+- All tests must pass before merge
+- Coverage must be >80% for new code
+- No critical linting errors
+- Performance benchmarks must be met
+
+### **Test File Organization**
+
+```
+mobile-app/
+├── __tests__/              # Unit tests
+│   ├── services/
+│   ├── utils/
+│   └── components/
+├── __integration__/        # Integration tests
+├── e2e/                    # E2E tests
+└── __performance__/        # Performance tests
+```
+
+**For complete testing details, see [TESTING_STRATEGY.md](./docs/testing/TESTING_STRATEGY.md)**
 
 ---
 
@@ -165,11 +384,14 @@ INFS/
 
 ### **Technical Metrics**
 - **Audio Sampling Rate:** 44.1 kHz
+- **Metering Interval:** 125ms (Fast response - IEC 61672)
+- **Classification Window:** 1 second (Slow response - industry standard)
 - **Processing Latency:** < 500ms from capture to classification
-- **Battery Impact:** < 5% per hour of continuous monitoring
+- **Battery Impact:** < 5% per hour (60 classifications/min)
 - **Classification Accuracy:** > 85% on validation dataset
 - **GPS Accuracy:** ± 10m outdoors, ± 20m indoors (acceptable)
 - **App Size:** < 50 MB
+- **Standards Compliance:** IEC 61672-1:2013, ISO 1996
 
 ### **User Experience Metrics**
 - **App Launch Time:** < 3 seconds
@@ -286,6 +508,8 @@ When starting a new session or needing project context:
 |------------|---------|--------------------------------------|------------|
 | 2025-10-14 | 1.0.0   | Initial project context created      | Claude AI  |
 | 2025-10-15 | 1.1.0   | Added Git Workflow Protocol section  | Claude AI  |
+| 2025-10-15 | 1.2.0   | Added Testing Methodology section    | Claude AI  |
+| 2025-11-20 | 1.3.0   | Updated architecture to expo-av with 1-second classification (IEC 61672) | Claude AI  |
 
 ---
 
