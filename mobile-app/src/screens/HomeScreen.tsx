@@ -296,13 +296,17 @@ export const HomeScreen: React.FC = () => {
                     onValueChange={handleBuildingChange}
                     style={styles.picker}
                     enabled={!isMonitoring}
+                    dropdownIconColor="#333"
+                    mode="dropdown"
                   >
-                    <Picker.Item label="Select Building..." value="" />
+                    <Picker.Item label="Select Building..." value="" color="#999" style={styles.pickerItem} />
                     {CAMPUS_LOCATIONS.map(location => (
                       <Picker.Item
                         key={location.id}
                         label={location.name}
                         value={location.name}
+                        color="#333"
+                        style={styles.pickerItem}
                       />
                     ))}
                   </Picker>
@@ -317,10 +321,12 @@ export const HomeScreen: React.FC = () => {
                     onValueChange={(value) => setSelectedRoom(value)}
                     style={styles.picker}
                     enabled={!isMonitoring && availableRooms.length > 0}
+                    dropdownIconColor="#333"
+                    mode="dropdown"
                   >
-                    <Picker.Item label="Select Room..." value="" />
+                    <Picker.Item label="Select Room..." value="" color="#999" style={styles.pickerItem} />
                     {availableRooms.map(room => (
-                      <Picker.Item key={room} label={room} value={room} />
+                      <Picker.Item key={room} label={room} value={room} color="#333" style={styles.pickerItem} />
                     ))}
                   </Picker>
                 </View>
@@ -561,9 +567,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E0E0E0',
     overflow: 'hidden',
+    justifyContent: 'center',
+    minHeight: 56,
   },
   picker: {
-    height: 50,
+    height: 56,
+    backgroundColor: '#FFFFFF',
+    color: '#333',
+  },
+  pickerItem: {
+    backgroundColor: '#FFFFFF',
+    color: '#333',
   },
   locationStatus: {
     marginTop: 8,

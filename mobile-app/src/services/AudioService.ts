@@ -268,7 +268,7 @@ export class AudioService {
       // But adjust for typical smartphone microphone sensitivity
       // Quiet room at -26 dBFS should be ~30 dB SPL, not 94 dB
       // So: SPL = dBFS + 56 (roughly: -26 + 56 = 30 dB)
-      const spl = rawValue + 56;
+      const spl = rawValue + 110;
       return Math.max(0, Math.min(120, spl));
     }
 
