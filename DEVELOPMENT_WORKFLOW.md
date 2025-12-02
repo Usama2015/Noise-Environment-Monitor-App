@@ -151,16 +151,16 @@ Task Type?
 
 **Current Phase:** Phase 3 (Testing & Polish)
 **Current Branch:** `phase/1-core-app`
-**Current Step:** Step 3-1 (Heatmap Enhancement with Time Decay)
-**Next Step:** Step 3-2 (Multi-device Testing)
+**Current Step:** Step 3-2 (Multi-device Testing)
+**Next Step:** Step 3-3 (UI Polish)
 
 **Last Updated:** 2025-12-02
 **Updated By:** Claude
 
 **Phase 1A Complete:** ✅ Core Audio Monitoring - AudioService + dB calibration
 **Phase 1B Complete:** ✅ Firebase Integration - E2E testing PASSED
-**Phase 2 Complete:** ✅ Map Visualization - MapScreen + Heatmap + Tab Navigation
-**Phase 3 In Progress:** 🔄 Testing & Polish - Heatmap decay + Time window slider added
+**Phase 2 Complete:** ✅ Map Visualization - MapScreen + Tab Navigation
+**Phase 3 In Progress:** 🔄 Testing & Polish - Colored circles + Time decay + Slider done
 
 ---
 
@@ -549,6 +549,7 @@ Testing Checklist:
 Git Workflow:
 [✅] Commit: feat(heatmap): add time decay system and time window slider
 [✅] Commit: chore(scripts): add Firebase test data population script
+[✅] Commit: fix(map): replace heatmap with colored circles based on dB level
 [✅] Push to remote
 
 Next Step: Step 3-2 (Multi-device Testing)
