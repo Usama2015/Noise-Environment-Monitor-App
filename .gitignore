@@ -115,3 +115,4 @@ temp/
 
 # Claude Code
 .claude/settings.local.json
+mobile-app/scripts/serviceAccountKey.json

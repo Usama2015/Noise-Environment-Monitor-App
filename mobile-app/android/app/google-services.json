@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "927247031500",
+    "project_id": "swe699lec12",
+    "storage_bucket": "swe699lec12.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:927247031500:android:e473a3205fe71e1131b669",
+        "android_client_info": {
+          "package_name": "com.noisemonitor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvdW01Rl8OkuOr2Dq-5VrDFrls0GrEbnI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

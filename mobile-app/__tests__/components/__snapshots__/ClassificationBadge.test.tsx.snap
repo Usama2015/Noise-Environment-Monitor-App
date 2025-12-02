@@ -1,0 +1,218 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ClassificationBadge Snapshot tests should match snapshot with all props 1`] = `
+<View
+  style={
+    {
+      "alignItems": "center",
+      "marginVertical": 16,
+    }
+  }
+>
+  <View
+    style={
+      [
+        {
+          "alignItems": "center",
+          "borderRadius": 25,
+          "elevation": 3,
+          "flexDirection": "row",
+          "paddingHorizontal": 20,
+          "paddingVertical": 12,
+          "shadowColor": "#000",
+          "shadowOffset": {
+            "height": 2,
+            "width": 0,
+          },
+          "shadowOpacity": 0.15,
+          "shadowRadius": 4,
+        },
+        {
+          "backgroundColor": "#FFC107",
+        },
+      ]
+    }
+  >
+    <Text
+      style={
+        {
+          "fontSize": 24,
+          "marginRight": 8,
+        }
+      }
+    >
+      🟡
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#fff",
+          "fontSize": 20,
+          "fontWeight": "bold",
+        }
+      }
+    >
+      Normal
+    </Text>
+  </View>
+  <Text
+    style={
+      {
+        "color": "#666",
+        "fontSize": 16,
+        "fontStyle": "italic",
+        "marginTop": 12,
+      }
+    }
+  >
+    Voice / Music
+  </Text>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "marginTop": 12,
+        "width": "80%",
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#999",
+          "fontSize": 12,
+          "marginRight": 8,
+          "width": 70,
+        }
+      }
+    >
+      Confidence:
+    </Text>
+    <View
+      style={
+        {
+          "backgroundColor": "#E0E0E0",
+          "borderRadius": 4,
+          "flex": 1,
+          "height": 8,
+          "overflow": "hidden",
+        }
+      }
+    >
+      <View
+        style={
+          [
+            {
+              "borderRadius": 4,
+              "height": "100%",
+            },
+            {
+              "backgroundColor": "#4CAF50",
+              "width": "87%",
+            },
+          ]
+        }
+      />
+    </View>
+    <Text
+      style={
+        {
+          "color": "#666",
+          "fontSize": 12,
+          "fontWeight": "600",
+          "marginLeft": 8,
+          "textAlign": "right",
+          "width": 40,
+        }
+      }
+    >
+      87
+      %
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "backgroundColor": "#F5F5F5",
+        "borderRadius": 8,
+        "marginTop": 12,
+        "maxWidth": "90%",
+        "paddingHorizontal": 16,
+        "paddingVertical": 8,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#666",
+          "fontSize": 12,
+          "lineHeight": 16,
+          "textAlign": "center",
+        }
+      }
+    >
+      Conversation, cafeteria, normal office (50-70 dB)
+    </Text>
+  </View>
+</View>
+`;
+
+exports[`ClassificationBadge Snapshot tests should match snapshot with minimal props 1`] = `
+<View
+  style={
+    {
+      "alignItems": "center",
+      "marginVertical": 16,
+    }
+  }
+>
+  <View
+    style={
+      [
+        {
+          "alignItems": "center",
+          "borderRadius": 25,
+          "elevation": 3,
+          "flexDirection": "row",
+          "paddingHorizontal": 20,
+          "paddingVertical": 12,
+          "shadowColor": "#000",
+          "shadowOffset": {
+            "height": 2,
+            "width": 0,
+          },
+          "shadowOpacity": 0.15,
+          "shadowRadius": 4,
+        },
+        {
+          "backgroundColor": "#FFC107",
+        },
+      ]
+    }
+  >
+    <Text
+      style={
+        {
+          "fontSize": 24,
+          "marginRight": 8,
+        }
+      }
+    >
+      🟡
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#fff",
+          "fontSize": 20,
+          "fontWeight": "bold",
+        }
+      }
+    >
+      Normal
+    </Text>
+  </View>
+</View>
+`;

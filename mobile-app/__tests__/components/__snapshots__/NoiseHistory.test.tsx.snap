@@ -1,0 +1,492 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NoiseHistory Snapshot tests should match snapshot for empty state 1`] = `
+<View
+  style={
+    {
+      "alignItems": "center",
+      "justifyContent": "center",
+      "paddingVertical": 40,
+    }
+  }
+>
+  <Text
+    style={
+      {
+        "color": "#999",
+        "fontSize": 16,
+        "fontWeight": "600",
+        "marginBottom": 4,
+      }
+    }
+  >
+    No readings yet
+  </Text>
+  <Text
+    style={
+      {
+        "color": "#BBB",
+        "fontSize": 13,
+      }
+    }
+  >
+    Start monitoring to see history
+  </Text>
+</View>
+`;
+
+exports[`NoiseHistory Snapshot tests should match snapshot with readings 1`] = `
+<View
+  style={
+    {
+      "flex": 1,
+      "marginTop": 20,
+    }
+  }
+>
+  <Text
+    style={
+      {
+        "color": "#333",
+        "fontSize": 16,
+        "fontWeight": "600",
+        "marginBottom": 12,
+        "paddingHorizontal": 16,
+      }
+    }
+  >
+    Recent Readings
+  </Text>
+  <RCTScrollView
+    contentContainerStyle={
+      {
+        "paddingHorizontal": 16,
+      }
+    }
+    showsVerticalScrollIndicator={false}
+    style={
+      {
+        "flex": 1,
+        "maxHeight": 300,
+      }
+    }
+  >
+    <View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#FAFAFA",
+            "borderRadius": 8,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+            "marginBottom": 8,
+            "paddingHorizontal": 12,
+            "paddingVertical": 12,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "fontSize": 16,
+                "marginRight": 12,
+              }
+            }
+          >
+            🔴
+          </Text>
+          <View
+            style={
+              {
+                "flex": 1,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#333",
+                    "fontSize": 14,
+                    "fontWeight": "600",
+                    "marginRight": 8,
+                  }
+                }
+              >
+                82.1
+                 dB
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#666",
+                    "fontSize": 14,
+                  }
+                }
+              >
+                Noisy
+              </Text>
+            </View>
+            <Text
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#999",
+                  "fontSize": 11,
+                  "fontStyle": "italic",
+                  "marginTop": 2,
+                }
+              }
+            >
+              Traffic / Heavy Machinery
+            </Text>
+          </View>
+        </View>
+        <Text
+          style={
+            {
+              "color": "#999",
+              "fontSize": 11,
+              "marginLeft": 8,
+            }
+          }
+        >
+          5m ago
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#FAFAFA",
+            "borderRadius": 8,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+            "marginBottom": 8,
+            "paddingHorizontal": 12,
+            "paddingVertical": 12,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "fontSize": 16,
+                "marginRight": 12,
+              }
+            }
+          >
+            🟡
+          </Text>
+          <View
+            style={
+              {
+                "flex": 1,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#333",
+                    "fontSize": 14,
+                    "fontWeight": "600",
+                    "marginRight": 8,
+                  }
+                }
+              >
+                68.7
+                 dB
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#666",
+                    "fontSize": 14,
+                  }
+                }
+              >
+                Normal
+              </Text>
+            </View>
+            <Text
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#999",
+                  "fontSize": 11,
+                  "fontStyle": "italic",
+                  "marginTop": 2,
+                }
+              }
+            >
+              Voice / Music
+            </Text>
+          </View>
+        </View>
+        <Text
+          style={
+            {
+              "color": "#999",
+              "fontSize": 11,
+              "marginLeft": 8,
+            }
+          }
+        >
+          3m ago
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#FAFAFA",
+            "borderRadius": 8,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+            "marginBottom": 8,
+            "paddingHorizontal": 12,
+            "paddingVertical": 12,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "fontSize": 16,
+                "marginRight": 12,
+              }
+            }
+          >
+            🟢
+          </Text>
+          <View
+            style={
+              {
+                "flex": 1,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#333",
+                    "fontSize": 14,
+                    "fontWeight": "600",
+                    "marginRight": 8,
+                  }
+                }
+              >
+                45.2
+                 dB
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#666",
+                    "fontSize": 14,
+                  }
+                }
+              >
+                Quiet
+              </Text>
+            </View>
+            <Text
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#999",
+                  "fontSize": 11,
+                  "fontStyle": "italic",
+                  "marginTop": 2,
+                }
+              }
+            >
+              Tonal Sound
+            </Text>
+          </View>
+        </View>
+        <Text
+          style={
+            {
+              "color": "#999",
+              "fontSize": 11,
+              "marginLeft": 8,
+            }
+          }
+        >
+          1m ago
+        </Text>
+      </View>
+    </View>
+  </RCTScrollView>
+</View>
+`;
+
+exports[`NoiseHistory Snapshot tests should match snapshot without timestamps 1`] = `
+<View
+  style={
+    {
+      "flex": 1,
+      "marginTop": 20,
+    }
+  }
+>
+  <Text
+    style={
+      {
+        "color": "#333",
+        "fontSize": 16,
+        "fontWeight": "600",
+        "marginBottom": 12,
+        "paddingHorizontal": 16,
+      }
+    }
+  >
+    Recent Readings
+  </Text>
+  <RCTScrollView
+    contentContainerStyle={
+      {
+        "paddingHorizontal": 16,
+      }
+    }
+    showsVerticalScrollIndicator={false}
+    style={
+      {
+        "flex": 1,
+        "maxHeight": 300,
+      }
+    }
+  >
+    <View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#FAFAFA",
+            "borderRadius": 8,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+            "marginBottom": 8,
+            "paddingHorizontal": 12,
+            "paddingVertical": 12,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "fontSize": 16,
+                "marginRight": 12,
+              }
+            }
+          >
+            🟡
+          </Text>
+          <View
+            style={
+              {
+                "flex": 1,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#333",
+                    "fontSize": 14,
+                    "fontWeight": "600",
+                    "marginRight": 8,
+                  }
+                }
+              >
+                60.0
+                 dB
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#666",
+                    "fontSize": 14,
+                  }
+                }
+              >
+                Normal
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+</View>
+`;
