@@ -3,7 +3,7 @@
 **Project:** Campus Noise Monitor (Cloud-First Edition)
 **Team:** Group 4 (GMU)
 **Report Period:** Semester 2025
-**Last Updated:** 2025-12-01
+**Last Updated:** 2025-12-02
 **Architecture:** Firebase Cloud-First with Real-time Sync
 
 ---
@@ -11,15 +11,15 @@
 ## 📊 Project Status Overview
 
 **Current Phase:** Phase 3 - Testing & Polish
-**Overall Progress:** 75% Complete
+**Overall Progress:** 80% Complete
 **On Schedule:** ✅ Yes
-**Blockers:** None - Phase 2 Complete
+**Blockers:** None
 
-**Major Architecture Change (Nov 29):**
-- Pivoted from local SQLite storage to Firebase Firestore (cloud-first)
-- Removed audio file storage (privacy-focused - only store dB values)
-- Added real-time sync for crowd-sourced data ("Waze for Noise")
-- Implemented Anonymous Authentication (no login required)
+**Recent Updates (Dec 2):**
+- Added heatmap time decay system
+- Added time window slider (1-60 minutes)
+- Added 6-hour max query window for Firebase optimization
+- Created test data population script for Horizon Hall
 
 ---
 
@@ -29,8 +29,8 @@
 |-------|--------|----------|-------|
 | **Phase 1A:** Core Audio Monitoring | ✅ Completed | 100% | AudioService + dB calibration working |
 | **Phase 1B:** Firebase Integration | ✅ Completed | 100% | E2E tested - Monitor → Upload → Firestore verified |
-| **Phase 2:** Location & Map Visualization | ✅ Completed | 100% | MapScreen + Heatmap + Tab Navigation |
-| **Phase 3:** Testing & Polish | 🔄 In Progress | 0% | Multi-device testing, UI polish |
+| **Phase 2:** Map Visualization | ✅ Completed | 100% | MapScreen + Heatmap + Tab Navigation |
+| **Phase 3:** Testing & Polish | 🔄 In Progress | 30% | Heatmap decay done, multi-device testing next |
 | **Phase 4:** Deployment & Demo | 🔲 Not Started | 0% | Final presentation preparation |
 
 **Legend:**
@@ -54,22 +54,14 @@
 - ✅ Start/Stop controls working
 
 #### **Technical Achievements:**
-- Correct calibration: `SPL = dBFS + 56`
-- Quiet room now reads 0-50 dB (not 93 dB)
+- Correct calibration: `SPL = dBFS + 110`
+- Quiet room now reads 30-50 dB
 - Logarithmic dB averaging
 - Android 14 compatible
 
-#### **Files Implemented:**
-```
-src/services/AudioService.ts ✅
-src/services/NoiseClassifier.ts ✅
-src/screens/HomeScreen.tsx ✅
-src/types/index.ts ✅
-```
-
 ---
 
-### **Week of 2025-11-25: Architecture Pivot**
+### **Week of 2025-11-25: Architecture Pivot & Phase 1B**
 
 #### **Major Decisions:**
 1. **Cloud-First:** Firebase Firestore instead of local SQLite
@@ -78,40 +70,53 @@ src/types/index.ts ✅
 4. **Anonymous Auth:** No account creation required
 5. **Hybrid Location:** GPS for map + Dropdown for room accuracy
 
-#### **Rationale:**
-- **Crowd-sourced data** is more valuable than single-user
-- **Real-time updates** enable "Waze for Noise" experience
-- **No audio files** simplifies storage & addresses privacy concerns
-- **Firebase** eliminates need for backend server
-- **Anonymous auth** removes friction for users
+#### **Phase 1B Completed:**
+- ✅ Firebase dependencies installed
+- ✅ AuthService (Anonymous auth)
+- ✅ StorageService (Firestore wrapper)
+- ✅ Campus locations constants
+- ✅ AudioService refactored for Firebase upload
+- ✅ Location picker UI in HomeScreen
+- ✅ E2E testing passed
 
 ---
 
-### **Current Session (2025-11-29): Firebase Integration**
+### **Week of 2025-12-01: Phase 2 Complete**
+
+#### **Phase 2 Completed:**
+- ✅ MapScreen with react-native-maps
+- ✅ Google Maps integration
+- ✅ Heatmap overlay for noise visualization
+- ✅ Real-time Firestore subscription
+- ✅ Bottom tab navigation (Monitor | Campus Map)
+- ✅ Legend showing noise level colors
+- ✅ User location display
+
+---
+
+### **Current Session (2025-12-02): Phase 3 Progress**
 
 #### **Completed:**
-- ✅ Installed Firebase dependencies (@react-native-firebase/app, auth, firestore)
-- ✅ Created new type definitions (NoiseReadingDocument)
-- ✅ Created campus locations constants (Fenwick, JC, Horizon)
-- ✅ Implemented AuthService (Anonymous auth)
-- ✅ Implemented StorageService (Firestore wrapper)
+- ✅ Heatmap time decay system
+  - Fresh data (0-2 min): Full intensity
+  - Decaying data (2-5 min): Reduced intensity
+  - Old data (5-10 min): Very faint
+- ✅ Time window slider (1-60 minutes)
+- ✅ 6-hour max query window for Firebase optimization
+- ✅ Test data population script for Horizon Hall
+- ✅ HeatmapConfig and DecayedReading types
+- ✅ subscribeToHeatmapWithDecay() method
 
 #### **In Progress:**
-- 🔄 Firebase project setup (user's task)
-- 🔄 google-services.json configuration
+- 🔄 Multi-device testing
+- 🔄 Performance optimization
 
-#### **Pending:**
-- ⏳ Refactor AudioService to upload readings
-- ⏳ Add location picker to HomeScreen
-- ⏳ Create MapScreen with heatmap
-- ⏳ Add bottom tab navigation
-
-#### **Files Created:**
+#### **Files Modified:**
 ```
-src/types/index.ts ✅ (Updated for Firebase)
-src/constants/locations.ts ✅ (NEW)
-src/services/AuthService.ts ✅ (NEW)
-src/services/StorageService.ts ✅ (NEW)
+src/types/index.ts - Added HeatmapConfig, DecayedReading, DEFAULT_HEATMAP_CONFIG
+src/services/StorageService.ts - Added decay functions and max query window
+src/screens/MapScreen.tsx - Added time window slider and decay subscription
+scripts/populate-test-data.js - NEW: Test data script
 ```
 
 ---
@@ -139,38 +144,39 @@ Every 1 second:
      - sessionId (UUID)
     ↓
 All users' maps update in real-time
+    ↓
+Heatmap applies time decay (older data fades)
 ```
 
 ### **Tech Stack:**
 | Component | Technology |
 |-----------|------------|
-| Framework | React Native (TypeScript) |
+| Framework | React Native 0.82 (TypeScript) |
 | Backend | Firebase Firestore |
 | Auth | Firebase Anonymous |
 | Audio | react-native-sound-level |
-| Maps | react-native-maps |
+| Maps | react-native-maps (Google Maps) |
+| Navigation | @react-navigation/bottom-tabs |
 | State | React Hooks |
 
 ---
 
 ## 📋 Current Sprint
 
-**Sprint Goal:** Complete Firebase Integration
-**Duration:** Nov 29 - Dec 5
+**Sprint Goal:** Complete Phase 3 Testing & Polish
+**Duration:** Dec 2 - Dec 8
 
 ### **Sprint Backlog:**
 
 | Task | Status | Priority |
 |------|--------|----------|
-| Firebase project setup | ⏳ Pending | P0 |
-| google-services.json configuration | ⏳ Pending | P0 |
-| Test Anonymous Auth | ⏳ Pending | P0 |
-| Test Firestore connection | ⏳ Pending | P0 |
-| Refactor AudioService for Firebase upload | 🔲 Todo | P1 |
-| Add location picker UI | 🔲 Todo | P1 |
-| Create MapScreen | 🔲 Todo | P2 |
-| Implement heatmap | 🔲 Todo | P2 |
-| Bottom tab navigation | 🔲 Todo | P2 |
+| Heatmap time decay | ✅ Done | P0 |
+| Time window slider | ✅ Done | P0 |
+| Test data script | ✅ Done | P1 |
+| Multi-device testing | 🔄 In Progress | P1 |
+| UI polish | 🔲 Todo | P2 |
+| Code cleanup | 🔲 Todo | P2 |
+| Documentation update | 🔲 Todo | P2 |
 
 ---
 
@@ -180,108 +186,90 @@ All users' maps update in real-time
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| **Phases Completed** | 1.5/4 | 4/4 | 🔄 38% |
-| **Core Features** | 5/9 | 9/9 | 🔄 56% |
-| **Services Implemented** | 3/5 | 5/5 | 🔄 60% |
-| **Screens Complete** | 1/2 | 2/2 | 🔄 50% |
+| **Phases Completed** | 2.3/4 | 4/4 | 🔄 58% |
+| **Core Features** | 8/9 | 9/9 | 🔄 89% |
+| **Services Implemented** | 4/5 | 5/5 | 🔄 80% |
+| **Screens Complete** | 2/2 | 2/2 | ✅ 100% |
 
 ### **Technical Metrics**
 
 | Metric | Status | Notes |
 |--------|--------|-------|
 | **Audio Capture** | ✅ Working | react-native-sound-level |
-| **dB Calibration** | ✅ Accurate | 0-50 dB in quiet room |
+| **dB Calibration** | ✅ Accurate | 30-50 dB in quiet room |
 | **Classification** | ✅ Working | Quiet/Normal/Noisy |
-| **Firebase Auth** | 🔄 Ready | Code complete, awaiting setup |
-| **Firestore Sync** | 🔄 Ready | Code complete, awaiting setup |
-| **Real-time Updates** | ⏳ Pending | After Firebase setup |
-| **GPS Integration** | ⏳ Pending | Phase 2 |
-| **Heatmap** | ⏳ Pending | Phase 2 |
+| **Firebase Auth** | ✅ Working | Anonymous auth active |
+| **Firestore Sync** | ✅ Working | Real-time updates |
+| **GPS Integration** | ✅ Working | Hybrid approach |
+| **Heatmap** | ✅ Working | With time decay |
+| **Tab Navigation** | ✅ Working | Monitor + Map tabs |
 
 ---
 
 ## 🎯 Next Milestones
 
-### **Immediate (Next 3 Days)**
-- [ ] Complete Firebase project setup
-- [ ] Configure google-services.json
-- [ ] Test Anonymous Auth login
-- [ ] Verify Firestore write/read
-- [ ] Refactor AudioService for cloud upload
+### **Immediate (Next 2 Days)**
+- [ ] Multi-device testing
+- [ ] Performance profiling
+- [ ] Memory leak check
 
 ### **This Week**
-- [ ] Add location picker dropdown
-- [ ] Test end-to-end: Monitor → Upload → Cloud
-- [ ] Create MapScreen skeleton
-- [ ] Implement tab navigation
+- [ ] UI polish and improvements
+- [ ] Code cleanup
+- [ ] Documentation finalization
 
 ### **Next Week**
-- [ ] GPS integration
-- [ ] Heatmap visualization
-- [ ] Multi-device testing
-- [ ] UI polish
+- [ ] Demo preparation
+- [ ] Final testing
+- [ ] Release build
 
 ---
 
 ## 🚧 Blockers & Risks
 
 ### **Current Blockers**
-*None* - Awaiting user to complete Firebase setup
+*None*
 
 ### **Risks & Mitigation**
 
 | Risk | Impact | Mitigation | Status |
 |------|--------|------------|--------|
-| Firebase quota limits | Medium | Start with test mode, monitor usage | ⏳ Monitoring |
-| Indoor GPS accuracy | High | Use hybrid approach (GPS + dropdown) | ✅ Solved |
-| Battery consumption | Medium | Use 1-second upload interval (not real-time) | ✅ Optimized |
-| Network dependency | Medium | Cache data locally, sync when online | ⏳ Plan |
+| Firebase quota limits | Medium | Added 6-hour max query window | ✅ Mitigated |
+| Indoor GPS accuracy | High | Hybrid approach (GPS + dropdown) | ✅ Solved |
+| Battery consumption | Medium | 1-second upload interval | ✅ Optimized |
+| Data staleness | Medium | Added time decay system | ✅ Solved |
 
 ---
 
 ## 🎉 Recent Achievements
 
-### **November 29, 2025: Firebase Architecture Complete**
+### **December 2, 2025: Heatmap Time Decay System**
 
-**Major Achievement:** Successfully designed and implemented complete Firebase cloud-first architecture
+**Major Achievement:** Implemented sophisticated time decay for heatmap visualization
 
-**What Changed:**
-- ❌ **Old:** Local SQLite + audio file storage
-- ✅ **New:** Firebase Firestore + real-time sync
-- ❌ **Old:** Single-user app
-- ✅ **New:** Crowd-sourced multi-user platform
-- ❌ **Old:** GPS only
-- ✅ **New:** Hybrid location (GPS + room selection)
+**Features Added:**
+- **Time Decay:** Older readings fade out gradually
+- **Time Window Slider:** Users can adjust 1-60 minute view
+- **Firebase Optimization:** 6-hour max query window
+- **Test Data Script:** Easy heatmap testing with sample data
 
-**Services Implemented:**
-1. ✅ **AuthService** - Anonymous authentication
-2. ✅ **StorageService** - Firestore CRUD operations
-3. ✅ **AudioService** - Real-time dB monitoring (existing)
-4. ⏳ **LocationService** - GPS coordinates (pending)
-5. ⏳ **MapService** - Heatmap rendering (pending)
+**Technical Implementation:**
+- Exponential decay function: `e^(-rate * progress)`
+- Configurable decay parameters
+- Location aggregation (best reading per location)
+- Proportional decay scaling with time window
 
 ---
 
-## 📝 Next Session Goals
+## 📝 Recent Commits
 
-1. **Firebase Setup** (User)
-   - Create Firebase project
-   - Download google-services.json
-   - Enable Anonymous Auth
-   - Create Firestore database
-   - Set security rules
-
-2. **Integration** (After Firebase ready)
-   - Modify AudioService to upload readings
-   - Add location picker to HomeScreen
-   - Test end-to-end flow
-   - Verify data appears in Firebase Console
-
-3. **Map Screen** (Phase 2)
-   - Create MapScreen component
-   - Add react-native-maps
-   - Implement heatmap overlay
-   - Subscribe to real-time updates
+```
+5a55de1 chore(scripts): add Firebase test data population script
+9759e61 feat(heatmap): add time decay system and time window slider
+281b3e4 docs(workflow): mark Phase 2 complete, update progress to 75%
+38e5fca feat(map): implement Phase 2 map visualization with tab navigation
+3127f65 docs(workflow): mark Phase 1B complete with E2E testing passed
+```
 
 ---
 
@@ -289,32 +277,20 @@ All users' maps update in real-time
 
 | Document | Status | Purpose |
 |----------|--------|---------|
-| **DEVELOPMENT_WORKFLOW.md** | ⭐ Master | Step-by-step execution checklist |
+| **DEVELOPMENT_WORKFLOW.md** | ✅ Updated | Step-by-step execution checklist |
 | **PROJECT_BLUEPRINT.md** | ✅ Current | Architecture & system design |
-| **FINAL_PLAN_REVIEW.md** | ✅ Current | Pre-implementation validation & verification |
-| **IMPLEMENTATION_SPEC.md** | ✅ Current | Exact code for all implementation steps |
-| **FIREBASE_IMPLEMENTATION_GUIDE.md** | ✅ Current | Code examples & Firebase tutorials |
-| **PROGRESS_REPORT.md** | ✅ Current | Progress tracking & metrics |
+| **PROGRESS_REPORT.md** | ✅ Updated | Progress tracking & metrics |
 | **GIT_STRATEGY.md** | ✅ Current | Git workflow & conventions |
-| **TESTING_STRATEGY.md** | ✅ Current | Testing guide with examples |
-| **FILE_REDUNDANCY_ANALYSIS.md** | ✅ Current | Documentation analysis |
-| **SESSION_SUMMARY_2025-11-20.md** | ✅ Archived | Session history |
-| **SESSION_SUMMARY_2025-11-29.md** | ✅ Archived | Session history |
-| **archive/REVISED_ARCHITECTURE.md** | ❌ Archived | Deprecated - use PROJECT_BLUEPRINT.md |
 
 ---
 
-**Last Updated:** 2025-12-01
-**Next Update:** After Firebase setup complete
-**Status:** ✅ Ready for Firebase integration
+**Last Updated:** 2025-12-02
+**Next Update:** After Phase 3 completion
+**Status:** 🔄 Phase 3 in progress - 80% overall complete
 
 ---
 
 **🔗 Key Documents:**
-- [DEVELOPMENT_WORKFLOW.md](DEVELOPMENT_WORKFLOW.md) - ⭐ Start here every session
+- [DEVELOPMENT_WORKFLOW.md](DEVELOPMENT_WORKFLOW.md) - Start here every session
 - [PROJECT_BLUEPRINT.md](PROJECT_BLUEPRINT.md) - Architecture reference
-- [FINAL_PLAN_REVIEW.md](FINAL_PLAN_REVIEW.md) - Pre-implementation validation
-- [IMPLEMENTATION_SPEC.md](IMPLEMENTATION_SPEC.md) - Exact code for all steps
-- [FIREBASE_IMPLEMENTATION_GUIDE.md](FIREBASE_IMPLEMENTATION_GUIDE.md) - Code examples
-- [GIT_STRATEGY.md](GIT_STRATEGY.md) - Git workflow
-- [TESTING_STRATEGY.md](TESTING_STRATEGY.md) - Testing guide
+- [PROGRESS_REPORT.md](PROGRESS_REPORT.md) - This file

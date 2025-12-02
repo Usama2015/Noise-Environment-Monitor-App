@@ -151,14 +151,16 @@ Task Type?
 
 **Current Phase:** Phase 3 (Testing & Polish)
 **Current Branch:** `phase/1-core-app`
-**Current Step:** Phase 3 preparation
-**Next Step:** Multi-device testing, UI polish
+**Current Step:** Step 3-1 (Heatmap Enhancement with Time Decay)
+**Next Step:** Step 3-2 (Multi-device Testing)
 
-**Last Updated:** 2025-12-01
+**Last Updated:** 2025-12-02
 **Updated By:** Claude
 
-**Phase 1B Complete:** ✅ Firebase Integration done - E2E testing PASSED
-**Phase 2 Complete:** ✅ Map Visualization done - MapScreen + Heatmap + Tab Navigation
+**Phase 1A Complete:** ✅ Core Audio Monitoring - AudioService + dB calibration
+**Phase 1B Complete:** ✅ Firebase Integration - E2E testing PASSED
+**Phase 2 Complete:** ✅ Map Visualization - MapScreen + Heatmap + Tab Navigation
+**Phase 3 In Progress:** 🔄 Testing & Polish - Heatmap decay + Time window slider added
 
 ---
 
@@ -509,9 +511,145 @@ Phase 2 Completion:
 
 Documentation Updates:
 [✅] Updated DEVELOPMENT_WORKFLOW.md (Phase 2 complete)
-[ ] Update PROGRESS_REPORT.md (Phase 2 complete)
+[✅] Update PROGRESS_REPORT.md (Phase 2 complete)
 
 Next Phase: Phase 3 (Testing & Polish)
+```
+
+---
+
+### **PHASE 3: Testing & Polish**
+
+#### **Step 3-1: Heatmap Enhancement with Time Decay** ✅ COMPLETED
+```
+Branch: phase/1-core-app
+Status: DONE
+Dependencies: Phase 2 complete
+
+Implementation Checklist:
+[✅] Add HeatmapConfig interface to types/index.ts
+[✅] Add DecayedReading interface to types/index.ts
+[✅] Add DEFAULT_HEATMAP_CONFIG constant
+[✅] Implement calculateDecayedWeight() function in StorageService
+[✅] Implement aggregateByLocation() function in StorageService
+[✅] Add subscribeToHeatmapWithDecay() method
+[✅] Add MAX_QUERY_WINDOW_HOURS (6 hours) limit
+[✅] Update legacy subscribeToHeatmap() with max query limit
+[✅] Install @react-native-community/slider
+[✅] Add time window slider to MapScreen (1-60 minutes)
+[✅] Update MapScreen to use subscribeToHeatmapWithDecay()
+[✅] Scale decay parameters proportionally with time window
+
+Testing Checklist:
+[✅] Create test data population script (scripts/populate-test-data.js)
+[✅] Test heatmap with varying data ages
+[✅] Test time window slider functionality
+[✅] Verify decay visual effect on heatmap
+
+Git Workflow:
+[✅] Commit: feat(heatmap): add time decay system and time window slider
+[✅] Commit: chore(scripts): add Firebase test data population script
+[✅] Push to remote
+
+Next Step: Step 3-2 (Multi-device Testing)
+```
+
+#### **Step 3-2: Multi-device Testing** 🔄 IN PROGRESS
+```
+Branch: phase/1-core-app
+Status: IN PROGRESS
+Dependencies: Step 3-1 complete
+
+Testing Checklist:
+[ ] Test on multiple Android devices (different screen sizes)
+[ ] Test on Android 10+ devices
+[ ] Verify real-time sync between devices
+[ ] Test heatmap updates when multiple users monitoring
+[ ] Test app performance with large dataset
+[ ] Test battery consumption during extended monitoring
+
+Performance Checklist:
+[ ] Monitor memory usage
+[ ] Check for memory leaks in subscriptions
+[ ] Verify cleanup on component unmount
+[ ] Test with poor network conditions
+
+Next Step: Step 3-3 (UI Polish)
+```
+
+#### **Step 3-3: UI Polish** 🔲 PENDING
+```
+Branch: phase/1-core-app
+Status: PENDING
+Dependencies: Step 3-2 complete
+
+UI Checklist:
+[ ] Review and improve HomeScreen layout
+[ ] Review and improve MapScreen layout
+[ ] Add loading indicators where needed
+[ ] Add error messages for user feedback
+[ ] Improve color scheme consistency
+[ ] Test dark mode (if applicable)
+[ ] Review accessibility features
+
+Next Step: Step 3-4 (Documentation & Code Cleanup)
+```
+
+#### **Step 3-4: Documentation & Code Cleanup** 🔲 PENDING
+```
+Branch: phase/1-core-app
+Status: PENDING
+Dependencies: Step 3-3 complete
+
+Code Cleanup:
+[ ] Remove unused imports
+[ ] Remove console.log statements (or convert to proper logging)
+[ ] Review and fix any TypeScript warnings
+[ ] Ensure consistent code formatting
+
+Documentation:
+[ ] Update README.md with setup instructions
+[ ] Update inline code comments
+[ ] Review all documentation files for accuracy
+[ ] Create demo preparation guide
+
+Next Phase: Phase 4 (Deployment & Demo)
+```
+
+---
+
+### **PHASE 4: Deployment & Demo**
+
+#### **Step 4-1: Demo Preparation** 🔲 PENDING
+```
+Branch: phase/1-core-app
+Status: PENDING
+Dependencies: Phase 3 complete
+
+Checklist:
+[ ] Prepare demo script/walkthrough
+[ ] Create sample test data for demo
+[ ] Test demo flow end-to-end
+[ ] Prepare backup plan if live demo fails
+[ ] Create presentation slides (if needed)
+
+Next Step: Step 4-2 (Final Release Build)
+```
+
+#### **Step 4-2: Final Release Build** 🔲 PENDING
+```
+Branch: phase/1-core-app → main
+Status: PENDING
+Dependencies: Step 4-1 complete
+
+Checklist:
+[ ] Merge phase/1-core-app to develop
+[ ] Merge develop to main
+[ ] Create release APK
+[ ] Test release build on device
+[ ] Tag release version
+
+Project Complete!
 ```
 
 ---
@@ -678,10 +816,10 @@ Or:
 
 ---
 
-**Last Updated:** 2025-12-01 (Claude should update this automatically)
-**Current Phase:** Phase 2 (Map Visualization)
-**Current Step:** 2-1 (Create MapScreen)
-**Next Step:** 2-2 (Heatmap Overlay)
+**Last Updated:** 2025-12-02 (Claude should update this automatically)
+**Current Phase:** Phase 3 (Testing & Polish)
+**Current Step:** 3-2 (Multi-device Testing)
+**Next Step:** 3-3 (UI Polish)
 
 ---
 
