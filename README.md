@@ -1,328 +1,263 @@
-# Noise Environment Monitor App 📊🔊
+# Campus Noise Monitor App
 
-[![Project Status](https://img.shields.io/badge/Status-In%20Planning-yellow)](PROGRESS_REPORT.md)
-[![Phase](https://img.shields.io/badge/Phase-0%20Research-blue)](#)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-
-> A mobile application that helps students find quiet study spaces on campus by measuring, classifying, and visualizing noise levels in real-time.
+A React Native mobile application that helps students find quiet study spaces on campus by measuring, classifying, and visualizing noise levels in real-time.
 
 **Team:** Group 4 (George Mason University)
 **Course:** INFS Semester Project
-**Academic Year:** 2025
+**Status:** Phase 3 Complete - Ready for Demo
 
 ---
 
-## 🎯 Project Overview
+## Features
 
-The Noise Environment Monitor App uses smartphone sensors (microphone and GPS) to:
-- **Measure** ambient noise levels in decibels (dB)
-- **Classify** environments as Quiet (<50dB), Normal (50-70dB), or Noisy (>70dB)
-- **Visualize** noise distribution across campus using interactive heatmaps
-- **Track** historical noise patterns to identify optimal study times
-
----
-
-## ✨ Key Features
-
-### **Core Features (MVP)**
-- 🎤 Real-time audio capture and noise measurement
-- 🧮 FFT-based signal processing for frequency analysis
-- 🤖 ML-powered noise classification
-- 📍 GPS location tagging for every measurement
-- 🗺️ Interactive campus heatmap showing noise levels
-- 📊 Historical data tracking and visualization
-- 💾 Offline-first architecture with local data storage
-
-### **Advanced Features (Phase 3 - Optional)**
-- ☁️ Backend API for multi-user data aggregation
-- 🌍 Campus-wide crowdsourced heatmap
-- 🔔 Push notifications for quiet spot alerts
-- 📈 Time-based trend analysis and predictions
-- 👥 Social features (share locations with friends)
+- **Real-time Noise Monitoring** - Measure ambient noise levels in decibels (dB)
+- **Noise Classification** - Automatically classify as Quiet (<40dB), Normal (40-60dB), Moderate (60-80dB), or Noisy (>80dB)
+- **Campus Map Visualization** - View noise levels on an interactive Google Map with colored circles
+- **Time Decay System** - Older readings fade out, showing only recent data
+- **Firebase Cloud Sync** - Real-time data synchronization across devices
+- **Building/Room Tagging** - Tag readings with specific campus locations
 
 ---
 
-## 🏗️ Architecture
+## Quick Start Guide
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Mobile Application                       │
-│               (React Native - iOS/Android)                   │
-│                                                              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │      UI      │  │   Services   │  │   Storage    │      │
-│  │  Screens &   │◄─┤  Audio, GPS  │◄─┤ AsyncStorage │      │
-│  │  Components  │  │  ML, FFT     │  │   (Local)    │      │
-│  └──────────────┘  └──────────────┘  └──────────────┘      │
-│         │                  │                                 │
-│         ▼                  ▼                                 │
-│  ┌──────────────────────────────────────┐                   │
-│  │   Device Sensors (Mic + GPS)         │                   │
-│  └──────────────────────────────────────┘                   │
-└─────────────────────────────────────────────────────────────┘
-                          │
-                          │ HTTPS (Phase 3 - Optional)
-                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                Backend Server (Node.js/Python)               │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │  REST API    │  │  PostgreSQL  │  │  WebSockets  │      │
-│  │  Endpoints   │◄─┤  + PostGIS   │◄─┤  Real-time   │      │
-│  └──────────────┘  └──────────────┘  └──────────────┘      │
-└─────────────────────────────────────────────────────────────┘
-```
+### Prerequisites
 
----
+Before you begin, ensure you have the following installed:
 
-## 🛠️ Technology Stack
+| Software | Version | Download |
+|----------|---------|----------|
+| Node.js | >= 20.0.0 | [nodejs.org](https://nodejs.org/) |
+| npm | >= 9.0.0 | Comes with Node.js |
+| Android Studio | Latest | [developer.android.com](https://developer.android.com/studio) |
+| JDK | 17+ | Included with Android Studio |
+| Git | Latest | [git-scm.com](https://git-scm.com/) |
 
-### **Mobile App**
-- **Framework:** React Native (TypeScript)
-- **Audio:** expo-av / react-native-audio
-- **Signal Processing:** Custom FFT / FFT.js
-- **GPS:** expo-location / react-native-geolocation
-- **Maps:** react-native-maps with heatmap overlay
-- **State:** React Context API / Redux Toolkit
-- **Storage:** AsyncStorage
-- **Testing:** Jest + React Native Testing Library
-
-### **Machine Learning**
-- **Training:** Python + scikit-learn / TensorFlow
-- **Inference:** TensorFlow Lite / ONNX Runtime (on-device)
-- **Features:** Spectral analysis, MFCC, frequency domain features
-
-### **Backend (Phase 3 - Optional)**
-- **Server:** Node.js + Express OR Python + FastAPI
-- **Database:** PostgreSQL with PostGIS extension
-- **Real-time:** WebSockets (Socket.io / ws)
-- **Deployment:** Railway / Render / AWS
-
----
-
-## 📁 Project Structure
-
-```
-noise-environment-monitor/
-├── docs/                       # Comprehensive documentation
-│   ├── architecture/           # System design docs
-│   ├── testing/                # Testing strategies
-│   └── design/                 # UI/UX designs
-│
-├── mobile-app/                 # React Native application
-│   ├── src/
-│   │   ├── components/         # Reusable UI components
-│   │   ├── screens/            # App screens
-│   │   ├── services/           # Business logic (audio, GPS, ML)
-│   │   ├── utils/              # Helper functions
-│   │   └── models/             # Data models
-│   └── tests/                  # Unit and integration tests
-│
-├── ml-models/                  # Machine learning pipeline
-│   ├── training/               # Model training scripts
-│   ├── preprocessing/          # Audio preprocessing
-│   └── models/                 # Trained model files
-│
-├── backend/                    # Backend API (Phase 3)
-├── research/                   # Prototypes and experiments
-│
-├── PROJECT_CONTEXT.md          # 📌 START HERE - Master context
-├── PROJECT_PLAN.md             # Detailed development plan
-├── PROGRESS_REPORT.md          # Real-time progress tracking
-├── GIT_STRATEGY.md             # Git workflow and conventions
-└── README.md                   # This file
-```
-
----
-
-## 🚀 Quick Start
-
-### **Prerequisites**
-- Node.js v16+ and npm
-- React Native CLI
-- Android Studio (for Android) or Xcode (for iOS)
-- Git
-
-### **Installation**
+### Step 1: Clone the Repository
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-team/noise-environment-monitor.git
-cd noise-environment-monitor
+git clone https://github.com/Usama2015/Noise-Environment-Monitor-App.git
+cd Noise-Environment-Monitor-App
+```
 
-# Install dependencies for mobile app
+### Step 2: Install Dependencies
+
+```bash
 cd mobile-app
 npm install
-
-# Install iOS dependencies (Mac only)
-cd ios && pod install && cd ..
-
-# Run on Android
-npx react-native run-android
-
-# Run on iOS (Mac only)
-npx react-native run-ios
 ```
 
-### **Running Tests**
+### Step 3: Firebase Setup (Required)
+
+The app requires Firebase for authentication and data storage.
+
+1. **Create Firebase Project**
+   - Go to [Firebase Console](https://console.firebase.google.com/)
+   - Click "Create a project" and follow the wizard
+   - Name it something like "CampusNoiseMonitor"
+
+2. **Add Android App**
+   - In Firebase Console, click "Add app" → Android
+   - Package name: `com.noisemonitor`
+   - Download `google-services.json`
+
+3. **Place Configuration File**
+   ```bash
+   # Copy the downloaded file to:
+   mobile-app/android/app/google-services.json
+   ```
+
+4. **Enable Authentication**
+   - Go to Firebase Console → Authentication → Sign-in method
+   - Enable "Anonymous" authentication
+
+5. **Create Firestore Database**
+   - Go to Firebase Console → Firestore Database
+   - Click "Create database"
+   - Select "Start in test mode" (for development)
+   - Choose your region (us-central recommended)
+
+### Step 4: Android Setup
+
+1. **Open Android Studio**
+2. **Set ANDROID_HOME environment variable**
+   - Windows: `C:\Users\<username>\AppData\Local\Android\Sdk`
+   - macOS: `~/Library/Android/sdk`
+   - Linux: `~/Android/Sdk`
+
+3. **Add to PATH** (if not already):
+   - `%ANDROID_HOME%\platform-tools`
+   - `%ANDROID_HOME%\emulator`
+
+### Step 5: Run the App
+
+**Option A: Physical Android Device (Recommended)**
+
+1. Enable Developer Options on your phone:
+   - Settings → About Phone → Tap "Build Number" 7 times
+2. Enable USB Debugging:
+   - Settings → Developer Options → USB Debugging → ON
+3. Connect phone via USB cable
+4. Run:
+   ```bash
+   # Start Metro bundler
+   npm start
+
+   # In another terminal, build and install
+   npx react-native run-android
+   ```
+5. If you see "Unable to load script" error:
+   ```bash
+   adb reverse tcp:8081 tcp:8081
+   ```
+   Then shake phone → Reload
+
+**Option B: Android Emulator**
+
+1. Open Android Studio → AVD Manager
+2. Create a virtual device (Pixel 4 recommended, API 33+)
+3. Start the emulator
+4. Run:
+   ```bash
+   npm start
+   npx react-native run-android
+   ```
+
+---
+
+## Using the App
+
+### Monitor Tab
+1. Select a **Building** from the dropdown
+2. Select a **Room** from the dropdown
+3. Tap **"Start Monitoring"**
+4. Grant microphone and location permissions when prompted
+5. View real-time noise levels and classification
+
+### Campus Map Tab
+1. View the Google Map centered on GMU campus
+2. Colored circles show noise readings:
+   - 🔵 **Blue** - Quiet (0-40 dB)
+   - 🟢 **Green** - Normal (40-60 dB)
+   - 🟡 **Yellow** - Moderate (60-80 dB)
+   - 🔴 **Red** - Noisy (80+ dB)
+3. Use the **time window slider** to filter by recency (1-60 minutes)
+4. Older readings appear more transparent (time decay)
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+**"Unable to load script from assets" on phone**
+```bash
+adb reverse tcp:8081 tcp:8081
+# Then shake phone and tap Reload
+```
+
+**Port 8081 already in use**
+```bash
+npx kill-port 8081
+npm start
+```
+
+**Build fails with Gradle error**
+```bash
+cd android
+./gradlew clean
+cd ..
+npx react-native run-android
+```
+
+**Metro bundler stuck**
+```bash
+npm start -- --reset-cache
+```
+
+**App crashes on startup**
+- Ensure `google-services.json` is in `android/app/`
+- Verify Firebase Anonymous Auth is enabled
+- Check that Firestore database exists
+
+---
+
+## Project Structure
+
+```
+mobile-app/
+├── src/
+│   ├── screens/
+│   │   ├── HomeScreen.tsx     # Monitor tab - noise recording
+│   │   └── MapScreen.tsx      # Map tab - visualization
+│   ├── services/
+│   │   ├── AudioService.ts    # Microphone capture & dB calculation
+│   │   ├── AuthService.ts     # Firebase anonymous auth
+│   │   └── StorageService.ts  # Firestore read/write
+│   ├── components/            # Reusable UI components
+│   ├── utils/                 # FFT, filters, calculators
+│   ├── constants/             # Campus locations
+│   └── types/                 # TypeScript definitions
+├── android/                   # Android native code
+├── App.tsx                    # Root component with navigation
+└── package.json
+```
+
+---
+
+## Development Commands
 
 ```bash
-# Run all tests
+# Start Metro bundler
+npm start
+
+# Start with cache reset
+npm start -- --reset-cache
+
+# Build and run on Android
+npx react-native run-android
+
+# Run tests
 npm test
 
-# Run with coverage
-npm test -- --coverage
+# Type check
+npx tsc --noEmit
 
-# Run linter
+# Lint code
 npm run lint
 ```
 
 ---
 
-## 📖 Documentation
+## Tech Stack
 
-Comprehensive documentation is available in the following files:
-
-- **[PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)** - 📌 **START HERE** - Master context file with links to everything
-- **[PROJECT_PLAN.md](PROJECT_PLAN.md)** - Detailed 5-phase development plan with steps, testing, and metrics
-- **[PROGRESS_REPORT.md](PROGRESS_REPORT.md)** - Live progress tracking (updated weekly)
-- **[GIT_STRATEGY.md](GIT_STRATEGY.md)** - Git branching strategy and commit conventions
-
-### **Technical Documentation**
-- **[docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md)** - System architecture and data flow
-- **[docs/testing/TESTING_STRATEGY.md](docs/testing/TESTING_STRATEGY.md)** - Testing approach and frameworks
-
----
-
-## 🎯 Development Phases
-
-| Phase | Duration | Goal | Status |
-|-------|----------|------|--------|
-| **Phase 0** | Week 1-2 | Research & Python prototype | 🔲 Not Started |
-| **Phase 1** | Week 3-5 | Core mobile app (audio capture) | 🔲 Not Started |
-| **Phase 2** | Week 6-8 | GPS integration & heatmap | 🔲 Not Started |
-| **Phase 3** | Week 9-10 | ML classifier & backend (optional) | 🔲 Not Started |
-| **Phase 4** | Week 11-12 | Testing & optimization | 🔲 Not Started |
-| **Phase 5** | Week 13-14 | Deployment & presentation | 🔲 Not Started |
-
-See [PROJECT_PLAN.md](PROJECT_PLAN.md) for detailed breakdown of each phase.
+| Category | Technology |
+|----------|------------|
+| Framework | React Native 0.82 |
+| Language | TypeScript 5.8 |
+| Navigation | React Navigation (Bottom Tabs) |
+| Maps | react-native-maps (Google Maps) |
+| Backend | Firebase (Auth + Firestore) |
+| Audio | react-native-sound-level |
+| State | React Hooks |
 
 ---
 
-## 🧪 Testing
-
-We follow a comprehensive testing strategy:
-
-- **Unit Tests:** All services and utilities (target: >80% coverage)
-- **Integration Tests:** Component interactions and data flow
-- **End-to-End Tests:** Full user journeys
-- **Manual Testing:** Real-world testing on campus locations
-
-Run tests: `npm test`
-
-See [TESTING_STRATEGY.md](docs/testing/TESTING_STRATEGY.md) for details.
-
----
-
-## 🤝 Contributing
-
-### **Git Workflow**
-
-We use **Git Flow** with the following branch types:
-- `main` - Production-ready code
-- `develop` - Integration branch
-- `feature/<name>` - New features
-- `bugfix/<name>` - Bug fixes
-- `release/<version>` - Release preparation
-
-### **Commit Convention**
-
-We follow **Conventional Commits**:
-
-```
-feat(audio): implement FFT signal processing
-fix(gps): handle null location gracefully
-docs(readme): update installation instructions
-```
-
-See [GIT_STRATEGY.md](GIT_STRATEGY.md) for complete guidelines.
-
----
-
-## 👥 Team
+## Team
 
 **Group 4 - George Mason University**
 
-- **Steve Sahayadarlin** - [jsahayad@gmu.edu](mailto:jsahayad@gmu.edu)
-- **Kai Liu** - [kliu29@gmu.edu](mailto:kliu29@gmu.edu)
-- **Usama Sarfaraz Khan** - [ukhan26@gmu.edu](mailto:ukhan26@gmu.edu)
-- **Abdulhamid Alhumaid** - [aalhuma@gmu.edu](mailto:aalhuma@gmu.edu)
+- Steve Sahayadarlin - jsahayad@gmu.edu
+- Kai Liu - kliu29@gmu.edu
+- Usama Sarfaraz Khan - ukhan26@gmu.edu
+- Abdulhamid Alhumaid - aalhuma@gmu.edu
 
 ---
 
-## 📊 Project Metrics
+## License
 
-### **Current Status**
-- **Phase:** Research & Prototyping
-- **Progress:** 0% (Planning Complete)
-- **Test Coverage:** 0%
-- **Features Complete:** 0/9
-
-### **Success Metrics (Target)**
-- Classification Accuracy: >85%
-- Battery Consumption: <5% per hour
-- GPS Accuracy: ±10m outdoors
-- App Launch Time: <3 seconds
-
-See [PROGRESS_REPORT.md](PROGRESS_REPORT.md) for detailed metrics.
+Academic project for George Mason University - INFS Course.
 
 ---
 
-## 📚 Resources
-
-### **Learning Materials**
-- [React Native Documentation](https://reactnative.dev/)
-- [FFT Tutorial](https://betterexplained.com/articles/an-interactive-guide-to-the-fourier-transform/)
-- [Audio Classification Papers](https://github.com/karolpiczak/ESC-50)
-
-### **Related Projects**
-- UrbanSound8K Dataset
-- ESC-50 Environmental Sound Classification
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🙏 Acknowledgments
-
-- George Mason University - INFS Department
-- Course Instructor: [Name TBD]
-- Academic Advisor: [Name TBD]
-
----
-
-## 📞 Contact
-
-For questions or support, please contact:
-- **Project Lead:** To Be Decided
-- **GitHub Issues:** [Report an issue](https://github.com/your-team/noise-environment-monitor/issues)
-
----
-
-## 🔗 Quick Links
-
-- 📌 [Project Context (START HERE)](PROJECT_CONTEXT.md)
-- 📋 [Development Plan](PROJECT_PLAN.md)
-- 📈 [Progress Report](PROGRESS_REPORT.md)
-- 🌿 [Git Strategy](GIT_STRATEGY.md)
-- 🏗️ [Architecture Docs](docs/architecture/ARCHITECTURE.md)
-- 🧪 [Testing Strategy](docs/testing/TESTING_STRATEGY.md)
-
----
-
-**🎓 Academic Project Notice:** This is a semester project for educational purposes at George Mason University. All work is original and completed by the team members listed above.
-
-**Last Updated:** 2025-10-14
+**Last Updated:** December 2, 2025
