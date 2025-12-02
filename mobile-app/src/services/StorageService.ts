@@ -122,8 +122,6 @@ export class StorageService {
           timestamp: firestore.FieldValue.serverTimestamp(),
         });
 
-      console.log('[StorageService] Reading saved. Doc ID:', docRef.id);
-
       return docRef.id;
     } catch (error) {
       console.error('[StorageService] Failed to save reading:', error);
@@ -170,7 +168,6 @@ export class StorageService {
             });
           });
 
-          console.log(`[StorageService] Heatmap updated: ${readings.length} readings`);
           callback(readings);
         },
         error => {
@@ -198,11 +195,6 @@ export class StorageService {
     const configWindowMs = config.timeWindowMinutes * 60 * 1000;
     const queryWindowMs = Math.min(configWindowMs, maxQueryWindowMs);
     const cutoffTime = new Date(Date.now() - queryWindowMs);
-
-    console.log(
-      `[StorageService] Query window: ${queryWindowMs / (60 * 1000)} minutes ` +
-      `(max: ${MAX_QUERY_WINDOW_HOURS} hours)`
-    );
 
     const unsubscribe = firestore()
       .collection(this.COLLECTION_NAME)
@@ -250,11 +242,6 @@ export class StorageService {
           // Aggregate by location - keep the most impactful reading per location
           const aggregated = aggregateByLocation(decayedReadings);
           const result = Array.from(aggregated.values());
-
-          console.log(
-            `[StorageService] Heatmap with decay: ${result.length} locations ` +
-            `(from ${decayedReadings.length} readings)`
-          );
 
           callback(result);
         },
@@ -358,7 +345,6 @@ export class StorageService {
         .limit(1)
         .get();
 
-      console.log('[StorageService] Connection test successful');
       return true;
     } catch (error) {
       console.error('[StorageService] Connection test failed:', error);

@@ -1,6 +1,6 @@
 # Noise Environment Monitor - Mobile App
 
-**Version:** 0.0.1 (Phase 1 - Development)
+**Version:** 1.0.0 (Phase 3 - Testing & Polish)
 **Framework:** React Native 0.82.0
 **Language:** TypeScript 5.8.3
 
@@ -10,23 +10,21 @@
 
 Mobile application for measuring, classifying, and visualizing ambient noise levels on campus using smartphone microphones and GPS. Helps students find quiet study spaces.
 
-### Key Features (Planned)
-- Real-time noise level measurement (decibels)
-- Intelligent noise classification (Quiet/Normal/Noisy)
-- GPS location tagging
-- Campus noise heatmap visualization
-- Historical noise data tracking
+### Key Features
+- ✅ Real-time noise level measurement (decibels)
+- ✅ Intelligent noise classification (Quiet/Normal/Noisy)
+- ✅ GPS location tagging
+- ✅ Campus noise heatmap visualization (colored circles with time decay)
+- ✅ Firebase cloud storage with real-time sync
+- ✅ Bottom tab navigation (Monitor | Campus Map)
+- ✅ Building/room location picker
 
 ### Current Status
-**Phase 1, Step 1.2: Microphone Audio Capture** - COMPLETE
-- ✅ React Native project initialized with TypeScript
-- ✅ Testing framework configured (Jest + React Native Testing Library)
-- ✅ Folder structure created
-- ✅ Type definitions established
-- ✅ AudioService implemented (340 lines)
-- ✅ 26 unit tests with 96.96% coverage
-- ✅ Android/iOS microphone permissions configured
-- ✅ Manual testing tool available
+**Phase 3: Testing & Polish** - IN PROGRESS
+- ✅ Phase 1A: Core Audio Monitoring (AudioService + dB calibration)
+- ✅ Phase 1B: Firebase Integration (Auth + Firestore)
+- ✅ Phase 2: Map Visualization (MapScreen + Tab Navigation)
+- 🔄 Phase 3: Testing & Polish (UI improvements, code cleanup)
 
 ---
 
@@ -73,6 +71,13 @@ cd ..
 
 ### 4. Android Setup
 Ensure Android Studio is installed and configured.
+
+### 5. Firebase Setup (Required)
+1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com)
+2. Add an Android app with package name: `com.noisemonitor`
+3. Download `google-services.json` and place it in `android/app/`
+4. Enable Anonymous Authentication in Firebase Auth
+5. Create a Firestore database (start in test mode)
 
 ---
 
@@ -299,27 +304,37 @@ docs: update installation instructions
 
 ---
 
-## Next Steps (Development Roadmap)
+## Development Phases
 
-### Phase 1: Core Mobile App (Current)
-- **Step 1.1:** React Native Setup ✅ COMPLETE
-- **Step 1.2:** Microphone Permission & Audio Capture ✅ COMPLETE
-- **Step 1.3:** Decibel Calculation (Next)
-- **Step 1.4:** Moving Average Filter
-- **Step 1.5:** FFT Implementation
-- **Step 1.6:** Threshold-Based Classification
-- **Step 1.7:** Basic UI Implementation
+### Phase 1: Core Mobile App ✅ COMPLETE
+- ✅ React Native Setup with TypeScript
+- ✅ AudioService with dB metering (IEC 61672 compliant)
+- ✅ Decibel calculation and calibration
+- ✅ Moving average filter for smooth readings
+- ✅ FFT processing for frequency analysis
+- ✅ Noise classification (Quiet/Normal/Noisy)
+- ✅ Firebase Authentication (anonymous)
+- ✅ Firebase Firestore integration
 
-### Phase 2: GPS & Mapping
-- GPS integration and location tagging
-- Map view with noise markers
-- Heatmap visualization
-- Historical data storage
+### Phase 2: GPS & Mapping ✅ COMPLETE
+- ✅ Google Maps integration
+- ✅ GPS location tagging
+- ✅ Colored circles for noise visualization
+- ✅ Time decay system (older readings fade)
+- ✅ Time window slider (1-60 minutes)
+- ✅ Bottom tab navigation
+- ✅ Real-time Firestore subscriptions
 
-### Phase 3: Machine Learning & Backend (Optional)
-- ML-based classification model
-- Backend API for data aggregation
-- Multi-user heatmap
+### Phase 3: Testing & Polish 🔄 IN PROGRESS
+- ✅ UI polish (Material Design colors)
+- ✅ Code cleanup (removed debug logs)
+- ✅ TypeScript fixes
+- 🔄 Documentation updates
+
+### Phase 4: Demo & Release (Upcoming)
+- Demo preparation
+- Release APK build
+- Final testing
 
 ---
 
@@ -416,5 +431,5 @@ For issues or questions:
 
 ---
 
-**Last Updated:** 2025-10-15
-**Status:** Phase 1, Step 1.2 Complete (AudioService + Testing Documentation)
+**Last Updated:** 2025-12-02
+**Status:** Phase 3 - Testing & Polish (Step 3-4: Documentation & Code Cleanup)
