@@ -93,3 +93,41 @@ export interface AudioSample {
   timestamp: Date;
   decibelLevel: number;
 }
+
+/**
+ * Heatmap configuration constants
+ * These can be adjusted to tune the heatmap behavior
+ */
+export interface HeatmapConfig {
+  /** Time window in minutes for data to be considered (default: 10) */
+  timeWindowMinutes: number;
+  /** Minutes after which decay starts (default: 2) */
+  decayStartMinutes: number;
+  /** Minimum weight factor to prevent full disappearance (default: 0.1) */
+  minWeightFactor: number;
+  /** Decay rate - higher means faster decay (default: 2) */
+  decayRate: number;
+}
+
+/**
+ * Default heatmap configuration
+ */
+export const DEFAULT_HEATMAP_CONFIG: HeatmapConfig = {
+  timeWindowMinutes: 10,
+  decayStartMinutes: 2,
+  minWeightFactor: 0.1,
+  decayRate: 2,
+};
+
+/**
+ * Processed reading with decay applied for heatmap display
+ */
+export interface DecayedReading {
+  latitude: number;
+  longitude: number;
+  decibel: number;           // Original dB value
+  decayedWeight: number;     // Weight after decay (0-1)
+  ageMinutes: number;        // Age of reading in minutes
+  building: string;
+  room: string;
+}

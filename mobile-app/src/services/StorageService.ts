@@ -10,7 +10,81 @@
 import firestore from '@react-native-firebase/firestore';
 import { Platform } from 'react-native';
 import authService from './AuthService';
-import { NoiseReading, NoiseReadingDocument } from '../types';
+import {
+  NoiseReading,
+  NoiseReadingDocument,
+  DecayedReading,
+  HeatmapConfig,
+  DEFAULT_HEATMAP_CONFIG,
+} from '../types';
+
+/**
+ * Maximum time window for Firestore queries (in hours)
+ * Prevents querying data that is days/weeks old
+ * This is a hard limit regardless of config.timeWindowMinutes
+ */
+const MAX_QUERY_WINDOW_HOURS = 6;
+
+/**
+ * Calculate the decay weight for a reading based on its age
+ * Uses exponential decay starting after decayStartMinutes
+ *
+ * @param decibel - The original decibel value
+ * @param ageMinutes - Age of the reading in minutes
+ * @param config - Heatmap configuration
+ * @returns Decayed weight between 0 and 1
+ */
+function calculateDecayedWeight(
+  decibel: number,
+  ageMinutes: number,
+  config: HeatmapConfig = DEFAULT_HEATMAP_CONFIG
+): number {
+  // Normalize decibel to 0-1 range (assuming max ~120 dB)
+  const baseWeight = Math.min(decibel / 120, 1);
+
+  // No decay for fresh readings
+  if (ageMinutes <= config.decayStartMinutes) {
+    return baseWeight;
+  }
+
+  // Calculate decay progress (0 to 1) over the decay period
+  const decayPeriod = config.timeWindowMinutes - config.decayStartMinutes;
+  const decayProgress = Math.min(
+    (ageMinutes - config.decayStartMinutes) / decayPeriod,
+    1
+  );
+
+  // Exponential decay: e^(-rate * progress)
+  const decayFactor = Math.exp(-config.decayRate * decayProgress);
+
+  // Apply decay but maintain minimum weight
+  return Math.max(baseWeight * decayFactor, config.minWeightFactor * baseWeight);
+}
+
+/**
+ * Aggregate readings by location (building + room)
+ * Returns the most impactful reading per location after decay
+ *
+ * @param readings - Array of decayed readings
+ * @returns Map of location key to best reading
+ */
+function aggregateByLocation(
+  readings: DecayedReading[]
+): Map<string, DecayedReading> {
+  const locationMap = new Map<string, DecayedReading>();
+
+  for (const reading of readings) {
+    const key = `${reading.building}:${reading.room}`;
+    const existing = locationMap.get(key);
+
+    // Keep the reading with highest decayed weight for this location
+    if (!existing || reading.decayedWeight > existing.decayedWeight) {
+      locationMap.set(key, reading);
+    }
+  }
+
+  return locationMap;
+}
 
 export class StorageService {
   private readonly COLLECTION_NAME = 'noise_readings';
@@ -59,20 +133,24 @@ export class StorageService {
 
   /**
    * Subscribe to real-time heatmap data
-   * Listens to all readings from the last hour
+   * Listens to all readings from the last hour (capped at MAX_QUERY_WINDOW_HOURS)
    *
    * @param callback - Function to call when data changes
    * @returns Unsubscribe function
+   * @deprecated Use subscribeToHeatmapWithDecay instead for better data handling
    */
   subscribeToHeatmap(
     callback: (readings: NoiseReadingDocument[]) => void
   ): () => void {
-    // Query: Get readings from the last 1 hour
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    // Query: Get readings from the last 1 hour (within the 6-hour max limit)
+    const oneHourMs = 60 * 60 * 1000;
+    const maxQueryWindowMs = MAX_QUERY_WINDOW_HOURS * 60 * 60 * 1000;
+    const queryWindowMs = Math.min(oneHourMs, maxQueryWindowMs);
+    const cutoffTime = new Date(Date.now() - queryWindowMs);
 
     const unsubscribe = firestore()
       .collection(this.COLLECTION_NAME)
-      .where('timestamp', '>', oneHourAgo)
+      .where('timestamp', '>', cutoffTime)
       .onSnapshot(
         querySnapshot => {
           const readings: NoiseReadingDocument[] = [];
@@ -97,6 +175,93 @@ export class StorageService {
         },
         error => {
           console.error('[StorageService] Heatmap subscription error:', error);
+        }
+      );
+
+    return unsubscribe;
+  }
+
+  /**
+   * Subscribe to real-time heatmap data with time decay
+   * Filters readings within the configured time window and applies decay
+   *
+   * @param callback - Function to call when data changes (receives decayed readings)
+   * @param config - Optional heatmap configuration (uses defaults if not provided)
+   * @returns Unsubscribe function
+   */
+  subscribeToHeatmapWithDecay(
+    callback: (readings: DecayedReading[]) => void,
+    config: HeatmapConfig = DEFAULT_HEATMAP_CONFIG
+  ): () => void {
+    // Calculate query window - use the smaller of config window or max limit (6 hours)
+    const maxQueryWindowMs = MAX_QUERY_WINDOW_HOURS * 60 * 60 * 1000;
+    const configWindowMs = config.timeWindowMinutes * 60 * 1000;
+    const queryWindowMs = Math.min(configWindowMs, maxQueryWindowMs);
+    const cutoffTime = new Date(Date.now() - queryWindowMs);
+
+    console.log(
+      `[StorageService] Query window: ${queryWindowMs / (60 * 1000)} minutes ` +
+      `(max: ${MAX_QUERY_WINDOW_HOURS} hours)`
+    );
+
+    const unsubscribe = firestore()
+      .collection(this.COLLECTION_NAME)
+      .where('timestamp', '>', cutoffTime)
+      .onSnapshot(
+        querySnapshot => {
+          const now = Date.now();
+          const decayedReadings: DecayedReading[] = [];
+
+          querySnapshot.forEach(doc => {
+            const data = doc.data();
+
+            // Skip if no timestamp (shouldn't happen, but safety check)
+            if (!data.timestamp) {
+              return;
+            }
+
+            // Calculate age in minutes
+            const timestampMs = data.timestamp.toMillis();
+            const ageMinutes = (now - timestampMs) / (60 * 1000);
+
+            // Skip readings older than the time window (edge case during subscription)
+            if (ageMinutes > config.timeWindowMinutes) {
+              return;
+            }
+
+            // Calculate decayed weight
+            const decayedWeight = calculateDecayedWeight(
+              data.decibel,
+              ageMinutes,
+              config
+            );
+
+            decayedReadings.push({
+              latitude: data.location.latitude,
+              longitude: data.location.longitude,
+              decibel: data.decibel,
+              decayedWeight,
+              ageMinutes,
+              building: data.location.building,
+              room: data.location.room,
+            });
+          });
+
+          // Aggregate by location - keep the most impactful reading per location
+          const aggregated = aggregateByLocation(decayedReadings);
+          const result = Array.from(aggregated.values());
+
+          console.log(
+            `[StorageService] Heatmap with decay: ${result.length} locations ` +
+            `(from ${decayedReadings.length} readings)`
+          );
+
+          callback(result);
+        },
+        error => {
+          console.error('[StorageService] Heatmap subscription error:', error);
+          // Return empty array on error so the UI can handle gracefully
+          callback([]);
         }
       );
 
