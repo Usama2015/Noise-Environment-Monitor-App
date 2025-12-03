@@ -4,7 +4,7 @@ A React Native mobile application that helps students find quiet study spaces on
 
 **Team:** Group 4 (George Mason University)
 **Course:** INFS Semester Project
-**Status:** Phase 3 Complete - Ready for Demo
+**Status:** PROJECT COMPLETE - v1.0.0 Released
 
 ---
 
@@ -260,4 +260,5 @@ Academic project for George Mason University - INFS Course.
 
 ---
 
-**Last Updated:** December 2, 2025
+**Last Updated:** December 3, 2025
+**Version:** v1.0.0
