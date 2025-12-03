@@ -1,8 +1,9 @@
 # Git Strategy - Campus Noise Monitor
 
 **Project:** Campus Noise Monitor (Firebase Cloud-First Edition)
-**Last Updated:** November 29, 2025
+**Last Updated:** December 3, 2025
 **Branching Model:** GitFlow (modified for academic project)
+**Status:** PROJECT COMPLETE - v1.0.0 Released
 
 ---
 
@@ -16,6 +17,7 @@
 - **Deployments:** Final demo, presentation
 - **Naming:** `main`
 - **Merge From:** `develop` only
+- **Status:** ✅ Contains v1.0.0 release
 
 #### **2. `develop`** (Integration)
 - **Purpose:** Integration branch for completed features
@@ -23,6 +25,7 @@
 - **Testing:** All unit tests must pass
 - **Naming:** `develop`
 - **Merge From:** Phase branches
+- **Status:** ✅ Synced with main
 
 ---
 
@@ -32,11 +35,9 @@
 - **Purpose:** Major development phases
 - **Lifetime:** Duration of phase (1-2 weeks)
 - **Naming Convention:** `phase/<number>-<description>`
-- **Examples:**
-  - `phase/1-core-app` ✅ (Current - Phase 1A complete)
-  - `phase/2-firebase-integration` (Phase 1B + 2)
-  - `phase/3-testing-polish`
-  - `phase/4-demo-prep`
+
+**Actual Implementation Note:**
+For this project, all phases were consolidated into a single branch `phase/1-core-app` for efficiency. This simplified the workflow while maintaining proper commit history.
 
 **Workflow:**
 ```bash
@@ -104,106 +105,91 @@ git push origin --delete step/2-1-map-screen
 
 ### **Phase 1A: Core Audio Monitoring** ✅ COMPLETED
 **Branch:** `phase/1-core-app`
-**Status:** Merged to develop
+**Status:** Complete and merged
 
 **Steps (as commits):**
 ```
-✅ step/1a-1-audio-service → feat(audio): implement AudioService with react-native-sound-level
-✅ step/1a-2-calibration → fix(audio): correct dB calibration (dBFS → SPL)
-✅ step/1a-3-classifier → feat(audio): implement NoiseClassifier
-✅ step/1a-4-ui → feat(ui): add real-time dB display to HomeScreen
-✅ step/1a-5-testing → test(audio): add unit tests for AudioService
+✅ feat(audio): implement AudioService with react-native-sound-level
+✅ fix(audio): correct dB calibration (dBFS → SPL with +110 offset)
+✅ feat(audio): implement NoiseClassifier with IEC 61672 compliance
+✅ feat(ui): add real-time dB display to HomeScreen
+✅ test(audio): add unit tests for AudioService
 ```
 
-**Merge to develop:**
+---
+
+### **Phase 1B: Firebase Integration** ✅ COMPLETED
+**Branch:** `phase/1-core-app` (consolidated)
+**Status:** Complete and merged
+
+**Steps:**
+```
+✅ chore(deps): install Firebase dependencies
+✅ refactor(types): update for Firestore (NoiseReadingDocument, etc.)
+✅ feat(constants): add campus locations
+✅ feat(firebase): implement AuthService with anonymous auth
+✅ feat(firebase): implement StorageService with Firestore integration
+✅ chore(firebase): add google-services.json configuration
+✅ refactor(audio): integrate Firebase upload for noise readings
+✅ feat(ui): add building/room location picker to HomeScreen
+✅ fix(e2e): Phase 1B E2E testing fixes (crypto polyfill, auth, calibration)
+```
+
+---
+
+### **Phase 2: Map Visualization** ✅ COMPLETED
+**Branch:** `phase/1-core-app` (consolidated)
+**Status:** Complete and merged
+
+**Steps:**
+```
+✅ feat(map): create MapScreen component with Google Maps
+✅ feat(map): implement colored circle markers based on dB level
+✅ feat(map): add real-time Firestore subscription
+✅ feat(nav): add bottom tab navigation (Monitor | Campus Map)
+✅ feat(map): add legend showing noise level colors
+```
+
+---
+
+### **Phase 3: Testing & Polish** ✅ COMPLETED
+**Branch:** `phase/1-core-app` (consolidated)
+**Status:** Complete and merged
+
+**Steps:**
+```
+✅ feat(heatmap): add time decay system for noise data
+✅ feat(ui): add time window slider (1-60 minutes)
+✅ chore(scripts): add Firebase test data population script
+✅ fix(map): replace heatmap with colored circles based on dB level
+✅ style(ui): polish HomeScreen and MapScreen UI (Material Design)
+✅ chore: code cleanup (remove console.logs, fix TypeScript warnings)
+✅ docs: update README with Firebase setup instructions
+```
+
+---
+
+### **Phase 4: Deployment & Demo** ✅ COMPLETED
+**Branch:** `phase/1-core-app` → `develop` → `main`
+**Status:** Complete - v1.0.0 Released
+
+**Steps:**
+```
+✅ docs(demo): add demo script and preparation guide
+✅ build: create release APK (68 MB)
+✅ test: verify release build on physical device
+✅ git tag v1.0.0: tag release version
+✅ docs: final documentation updates
+```
+
+**Final Merge:**
 ```bash
+# Merged phase/1-core-app → develop → main
 git checkout develop
 git merge phase/1-core-app
-git tag v1.0-phase1a
-git push origin develop --tags
-```
-
----
-
-### **Phase 1B + 2: Firebase Integration & Map** 🔄 IN PROGRESS
-**Branch:** `phase/2-firebase-integration`
-**Status:** 60% complete
-
-**Steps:**
-
-#### **Phase 1B: Firebase Services**
-```
-✅ step/1b-1-dependencies → chore(deps): install Firebase dependencies
-✅ step/1b-2-types → refactor(types): update for Firestore
-✅ step/1b-3-locations → feat(constants): add campus locations
-✅ step/1b-4-auth → feat(firebase): implement AuthService
-✅ step/1b-5-storage → feat(firebase): implement StorageService
-⏳ step/1b-6-firebase-setup → chore(firebase): add google-services.json
-⏳ step/1b-7-audio-refactor → refactor(audio): integrate Firebase upload
-⏳ step/1b-8-location-picker → feat(ui): add building/room picker to HomeScreen
-```
-
-#### **Phase 2: Map Visualization**
-```
-⏳ step/2-1-map-screen → feat(map): create MapScreen component
-⏳ step/2-2-heatmap → feat(map): implement heatmap overlay
-⏳ step/2-3-realtime → feat(map): add real-time Firestore subscription
-⏳ step/2-4-navigation → feat(nav): add bottom tab navigation
-```
-
-**Testing checkpoints:**
-- After step/1b-7: Unit test AudioService Firebase upload
-- After step/1b-8: Integration test full monitor flow
-- After step/2-3: Multi-device sync test
-
-**Merge to develop:**
-```bash
-git checkout develop
-git merge phase/2-firebase-integration
-git tag v2.0-firebase
-git push origin develop --tags
-```
-
----
-
-### **Phase 3: Testing & Polish** 🔲 NOT STARTED
-**Branch:** `phase/3-testing-polish`
-
-**Steps:**
-```
-⏳ step/3-1-multi-device → test(integration): multi-device sync testing
-⏳ step/3-2-ui-polish → style(ui): improve HomeScreen and MapScreen
-⏳ step/3-3-error-handling → feat(ui): add error states and loading indicators
-⏳ step/3-4-battery-test → test(perf): measure battery consumption
-⏳ step/3-5-e2e → test(e2e): end-to-end user journey
-```
-
-**Merge to develop:**
-```bash
-git checkout develop
-git merge phase/3-testing-polish
-git tag v3.0-beta
-git push origin develop --tags
-```
-
----
-
-### **Phase 4: Deployment & Demo** 🔲 NOT STARTED
-**Branch:** `phase/4-demo-prep`
-
-**Steps:**
-```
-⏳ step/4-1-demo-data → feat(demo): add demo mode with sample data
-⏳ step/4-2-presentation → docs(demo): create presentation materials
-⏳ step/4-3-rehearsal → test(demo): demo rehearsal and fixes
-⏳ step/4-4-final-polish → style(ui): final UI tweaks
-```
-
-**Merge to main:**
-```bash
 git checkout main
 git merge develop
-git tag v1.0.0-release
+git tag -a v1.0.0 -m "v1.0.0 - Campus Noise Monitor Release"
 git push origin main --tags
 ```
 
@@ -244,7 +230,7 @@ git push origin main --tags
 ```bash
 # Good commits:
 git commit -m "feat(firebase): implement AuthService with anonymous auth"
-git commit -m "fix(audio): correct dB calibration offset to +56"
+git commit -m "fix(audio): correct dB calibration offset to +110"
 git commit -m "test(audio): add unit tests for NoiseClassifier"
 git commit -m "docs(readme): update installation instructions"
 
@@ -256,32 +242,39 @@ git commit -m "WIP"
 
 ---
 
-## 🔄 Workflow Diagram
+## 🔄 Final Workflow Diagram
 
 ```
-main (production)
+main (production) ─────────────────────────────────────── v1.0.0 ✅
   │
-  └─── develop (integration)
+  └─── develop (integration) ──────────────────────────── synced ✅
          │
-         ├─── phase/1-core-app ✅
-         │      ├─── step/1a-1-audio-service
-         │      ├─── step/1a-2-calibration
-         │      └─── step/1a-3-classifier
-         │
-         ├─── phase/2-firebase-integration 🔄
-         │      ├─── step/1b-1-dependencies ✅
-         │      ├─── step/1b-2-types ✅
-         │      ├─── step/1b-3-locations ✅
-         │      ├─── step/1b-4-auth ✅
-         │      ├─── step/1b-5-storage ✅
-         │      ├─── step/1b-6-firebase-setup ⏳
-         │      ├─── step/1b-7-audio-refactor ⏳
-         │      ├─── step/2-1-map-screen ⏳
-         │      └─── step/2-2-heatmap ⏳
-         │
-         ├─── phase/3-testing-polish 🔲
-         │
-         └─── phase/4-demo-prep 🔲
+         └─── phase/1-core-app (all phases consolidated) ─ complete ✅
+                │
+                ├─── Phase 1A: Core Audio Monitoring ✅
+                │      ├─── AudioService implementation
+                │      ├─── dB calibration (+110 offset)
+                │      └─── NoiseClassifier (IEC 61672)
+                │
+                ├─── Phase 1B: Firebase Integration ✅
+                │      ├─── AuthService (anonymous auth)
+                │      ├─── StorageService (Firestore)
+                │      └─── Location picker UI
+                │
+                ├─── Phase 2: Map Visualization ✅
+                │      ├─── MapScreen with Google Maps
+                │      ├─── Colored circle markers
+                │      └─── Tab navigation
+                │
+                ├─── Phase 3: Testing & Polish ✅
+                │      ├─── Time decay system
+                │      ├─── Time window slider
+                │      └─── UI polish (Material Design)
+                │
+                └─── Phase 4: Deployment & Demo ✅
+                       ├─── Demo script
+                       ├─── Release APK build
+                       └─── v1.0.0 tag
 ```
 
 ---
@@ -364,42 +357,49 @@ Closes #X (if applicable)
 
 ### **Version Format:** `vX.Y.Z-<label>`
 
-**Examples:**
+**Planned Tags:**
 - `v1.0-phase1a` - Phase 1A complete (Audio monitoring)
 - `v2.0-firebase` - Phase 1B + 2 complete (Firebase + Map)
 - `v3.0-beta` - Phase 3 complete (Testing & Polish)
 - `v1.0.0-release` - Final demo version
 
+**Actual Tags Created:**
+- `v1.0.0` ✅ - Final release (all phases complete)
+
 **Create Tags:**
 ```bash
-git tag -a v2.0-firebase -m "Phase 2 complete: Firebase integration and map visualization"
-git push origin v2.0-firebase
+git tag -a v1.0.0 -m "v1.0.0 - Campus Noise Monitor Release"
+git push origin v1.0.0
 ```
 
 ---
 
-## 📊 Current Status
+## 📊 Final Status
 
 ### **Branches:**
 ```
-main              → Production (stable)
-develop           → Integration (latest stable features)
-phase/1-core-app  → Completed, merged ✅
-phase/2-firebase-integration → In progress 🔄 (60%)
+main              → Production (v1.0.0) ✅
+develop           → Integration (synced with main) ✅
+phase/1-core-app  → All phases complete, merged ✅
 ```
 
-### **Recent Commits:**
+### **Tags:**
 ```
-ddf8ab2 chore(deps): remove react-native-audio-recorder-player
-fae14c2 chore(deps): add expo-av for audio recording
-b4fbff5 fix(android): add Android 14 foreground service permissions
-9d30fea docs: update all documentation for IEC 61672 compliance
-94de710 feat(audio): implement IEC 61672 compliant 1-second classification window
+v1.0.0            → Final release ✅
+```
+
+### **Key Commits (Recent):**
+```
+f9371e7 docs: add final session summary and update progress report
+d142fb9 docs: mark project complete - v1.0.0 release
+4513adf docs(demo): add demo script and preparation guide (Step 4-1)
+9983ee7 docs: update main README with detailed setup instructions
+4a96bb7 docs(workflow): mark Step 3-4 complete, Phase 3 done
 ```
 
 ---
 
-## 🚀 Quick Commands
+## 🚀 Quick Commands (Reference)
 
 ### **Start New Phase:**
 ```bash
@@ -452,6 +452,25 @@ git push origin develop --tags
 
 ---
 
-**Last Updated:** November 29, 2025
-**Current Branch:** `phase/1-core-app` (completed)
-**Next Branch:** `phase/2-firebase-integration` (to be created)
+## 📌 Project Complete
+
+**Final Status:** PROJECT COMPLETE - v1.0.0 Released
+
+**All Phases Complete:**
+- ✅ Phase 1A: Core Audio Monitoring
+- ✅ Phase 1B: Firebase Integration
+- ✅ Phase 2: Map Visualization
+- ✅ Phase 3: Testing & Polish
+- ✅ Phase 4: Deployment & Demo
+
+**All Branches Synced:**
+- ✅ `phase/1-core-app` → `develop` → `main`
+
+**Release Tag:**
+- ✅ `v1.0.0` created and pushed
+
+---
+
+**Last Updated:** December 3, 2025
+**Project Status:** COMPLETE
+**Version:** v1.0.0
